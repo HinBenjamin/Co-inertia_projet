@@ -1,44 +1,64 @@
-# Analyse de co-inertie
+# Analyse de Co-inertie (CoIA) — Analyse Multitableaux
 
+Ce dépôt rassemble les supports théoriques, méthodologiques et pratiques sur l'**Analyse de Co-inertie** (CoIA, package R `ade4`), ainsi qu'une présentation interactive au format Quarto.
 
+---
 
-## 1. Introduction & Problématique
+## 📁 Structure du projet
 
+```text
+.
+├── cours/                      # Cours et manuels théoriques complets
+│   ├── COURS_COINERTIE.md      # Synthèse de cours (triplets statistiques, inertie, RV, dualité)
+│   └── MANUEL_COMPLET_COINERTIE.md # Manuel détaillé de référence (mathématiques, code R, interprétations)
+├── presentation/               # Diaporama Quarto (Reveal.js)
+│   ├── Presentation.qmd        # Source de la présentation
+│   └── Presentation.html       # Présentation compilée en HTML autonome (embed-resources)
+├── docs/                       # Articles scientifiques et supports de référence (PDF)
+│   ├── Chessel_Dufour_cssb8_Coinertie.pdf
+│   ├── Course6_Coinertia_Analysis.pdf
+│   ├── Culhane_etal_2003_Coinertia_Microarrays.pdf
+│   ├── Dray_etal_2003_Coinertia.pdf
+│   └── PBIL_tdr62_TD_Coinertie_R.pdf
+├── scripts/                    # Scripts R pour les analyses et exemples
+├── .gitignore                  # Fichiers et dossiers ignorés par Git
+└── README.md                   # Présentation générale du projet
+```
 
-### 1.1. 2 tableaux 
+---
 
-Il s'agit d'étude la structure de variabilité dans deux ou plusieurs tableaux, on veut chercher à discuter de la relations entres les tableaux au niveau des relations entre les structures. En faisant le parallèle avec qu'en analyse multi-tableaux on regarde avec importance comment se comporte les structures le comportement de chacune des analyses séparées. Par exemple, en science voire en écologie, microbiologie et en gémonique, il y'a des cas où l'on est confronté en couplage de deux points de vue différents sur les mêmes individus : 
+## 🎯 Objectifs & Principe de la méthode
 
-- Tableau $X (lignes * p colonnes)$  : Méta-données
-- Tableau $Y (lignes * p colonnes)$  : Table d'abaondance 
+L'analyse de co-inertie (Dolédec & Chessel 1994, Dray et al. 2003) est une méthode d'ordination symétrique permettant de coupler **deux tableaux de données mesurés sur les mêmes individus** :
+- **Tableau $X$ ($n \times p$)** : Ex. variables environnementales / physico-chimiques
+- **Tableau $Y$ ($n \times q$)** : Ex. abondances d'espèces ou diversité taxonomique / fonctionnelle
 
-Les deux tableaux partagent obligatoirement les mêmes individus. 
+### Pourquoi utiliser la co-inertie ?
+Contrairement à la régression ou aux analyses canoniques classiques (ACC, RDA), la co-inertie :
+1. **Tolère un grand nombre de variables** ($p, q \gg n$) sans problème de multicolinéarité ou de sur-ajustement.
+2. **Offre une grande flexibilité** : chaque tableau peut être analysé préalablement par la méthode la plus appropriée (ACP normée ou non, AFC, PCoA, ACM) via le formalisme des triplets statistiques $(X, Q_X, D_n)$ et $(Y, Q_Y, D_n)$.
+3. **Maximise la covariance** : elle identifie des axes projetés qui maximisent simultanément la variance de chaque nuage et la corrélation entre les projections.
 
-### 1.2. Limites des approches hors co-inertie
-Nous utilisons cette méthode car elles possèdent des aspects qui ne sont pas bien aborder dans les autres méthodes. Par exemple dans le cas de faire deux ACP sur les deux tablaux ne marche pas car rien les phénomènes capturés chez l'un et les autres axes de sont pas les mêmes et peuvent capturé des phénomènes indépendant. 
+---
 
-Ainsi, l'analyse de la co-inertie nous permet de trouver un ensemble d'axe qui extrait simultanément la variabilité maximale de chaque tableau tout en maximisant leur corrélation. 
+## 🚀 Utilisation & Rendu
 
-## 2. Formalisation de la co-inertie
+### Prérequis R
+Pour exécuter les analyses ou recompiler la présentation :
+```r
+install.packages(c("ade4", "adegraphics", "knitr"))
+```
 
-On va cherhcer à associé chaque tablaeu à un triplet statistique qui est chacun décomposée de la manière suivante avec : une matrice diagonale, et une matice Q associé à un ensemble de métrique associé au variable. 
+### Visualiser la présentation
+- Ouvrez directement [presentation/Presentation.html](file:///Users/hin.benjamin/AMD_projet/presentation/Presentation.html) dans n'importe quel navigateur web.
+- Pour recompiler le diaporama avec [Quarto](https://quarto.org/) :
+  ```bash
+  quarto render presentation/Presentation.qmd
+  ```
 
-### 2.1 Inertie et nuage de points 
+---
 
-L'inertie mesure la dispersion du nuage par rapport à son centre de gravité, elle mesure la taille globale du nuage mais pas sa forme ni sa direction principale d'élongation. Elle est de la forme : 
-
-I(X) = \operatorname{Tr}(X Q_X X^T D_n) = \sum_{k=1}^r \lambda_k
-
-### 2.2 Variance et Covariance vectorielle 
-
-Ces métriques nous permetent de mesurer la structure interne et la forme du nuage ainsi que la liaison globale entre les deux structures de données. 
-
-
-# Résumé de la méthode 
-
-On va chercher à mettre en relation deuc tableaux de données distincts qui ont été mesuré sur les mêmes individus. On veut expliquer un tableau par un autre, on veut chercher à trouver un strcuture commune au deux tableaux. Autrement dit voir si les individus s'organisent de la même manière d'un point du tableau 1 et du tableau. 
-
-On commence par analyser chaque tableau séparement avce la méthode la plus approprié. On va ensuite chercher l'axe d'ordinatioin pour lequel on a la le max de covariance. La co inertie peut être vue comme la corrélation de la variance du tableau 1 et celui du tableau 2. Cette méthode nous permet de d'anayser de jeu de données avec beaucoup de variable mais aussi elle est plus felxible vis-à-vis du type de tableau mais il faut faire la bonne analyse au début. 
-
-Afin d'interpréter au mieux cette méthode il faut voir regarder le Rv qui mesure la corrélation entre les deux tableaux. On peut tester cette corrélation via le test de Monte-Carlo. Dans le graphique en flèche il faut regarder si les flèches sont courtes ou pas cela nous donne des informations sur la concordance entre les deux tableaux est fortes et si elles le sont toutes cela nous permet de dire que la co-struture du tableau est forte.  
-
+## 👥 Auteurs
+- Quentin
+- Inès
+- Benjamin

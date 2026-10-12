@@ -1,0 +1,17 @@
+# .gitignore pour projet R / Quarto
+
+# Quarto & R Markdown cache / outputs
+.quarto/
+*_cache/
+*_files/
+!presentation/*_files/
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
+
+# Fichiers système et éditeur
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
