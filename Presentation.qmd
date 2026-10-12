@@ -1,0 +1,433 @@
+---
+title: "Analyse de Co-inertie"
+subtitle: "Théorie de l'ordination multitableaux et application écologique"
+author: "Quentin, Inès, Benjamin"
+date: today
+format: 
+  revealjs: 
+    theme: simple 
+    slide-number: true
+    menu: true
+    smaller: true
+    scrollable: true
+    embed-resources: true
+execute: 
+  echo: true
+  warning: false
+  message: false
+---
+
+## 1. Données d'étude : Matrice Milieu ($X$)
+
+Dispositif fluvial du Doubs (Verneaux, 1973) — **$n = 30$ stations d'échantillonnage** :
+
+```{r}
+#| echo: false
+library(ade4)
+library(knitr)
+data(doubs)
+
+env_sub <- head(doubs$env[, c("dfs", "alt", "slo", "flo", "pH", "oxy", "nit", "pho")], 5)
+colnames(env_sub) <- c("Dist. source (km)", "Altitude (m)", "Pente (%)", "Débit (m³/s)", "pH", "Oxygène", "Nitrates", "Phosphates")
+rownames(env_sub) <- paste("Station", 1:5)
+
+kable(env_sub)
+```
+
+<u>**Tableau 1a : Matrice $X$ — Descripteurs physico-chimiques et morphologiques (30 × 11)**</u>
+
+* **Nature des variables :** Variables quantitatives continues d'unités hétérogènes (mètres, %, m³/s, mg/L).
+* **Ordination préliminaire :** **ACP normée** (standardisation centrée-réduite obligatoire).
+
+::: {.notes}
+Présentons d'abord le premier jeu de données : la matrice environnementale X. Sur 30 stations, 11 variables continues très hétérogènes. La standardisation est indispensable pour que les mètres d'altitude n'écrasent pas les variations de pH.
+:::
+
+## 2. Données d'étude : Matrice Faune ($Y$)
+
+Mesures appariées sur les **$n = 30$ mêmes stations** de la rivière :
+
+```{r}
+#| echo: false
+fish_sub <- head(doubs$fish[, c("Satr", "Phph", "Neba", "Thth", "Eslu", "Abbr", "Ruru", "Titi")], 5)
+colnames(fish_sub) <- c("Truite", "Vairon", "Loche", "Ombre", "Brochet", "Brème", "Gardon", "Tanche")
+rownames(fish_sub) <- paste("Station", 1:5)
+
+kable(fish_sub)
+```
+
+<u>**Tableau 1b : Matrice $Y$ — Dénombrements de la communauté ichtyologique (30 × 27)**</u>
+
+* **Nature des variables :** Abondances discrètes en classes d'abondance (0 = absence à 5 = très abondant).
+* **Ordination préliminaire :** **ACP centrée** (préservation des abondances relatives entre espèces).
+
+::: {.notes}
+Voici le second jeu de données apparié : la faune Y. 27 espèces de poissons échantillonnées aux mêmes endroits. Les données sont de même nature (classes d'abondances), on réalise une ACP simplement centrée sans réduire la variance.
+:::
+
+## 3. Du schéma isolé au couplage structural
+
+<br>
+
+Deux approches possibles pour relier deux matrices :
+
+<br>
+
+::: {layout-ncol=2}
+### Approches asymétriques
+- **RDA, CCA** (modélisation linéaire)
+- Relation directionnelle : $Y = f(X)$
+- Expliquer la biologie par le milieu
+
+### Approches symétriques
+- **Co-inertie, Procruste**
+- Statut égalitaire des matrices
+- Recherche d'une **co-structure**
+:::
+
+<br>
+
+* **Limite de l'ACP isolée :** Elle explore la variance interne d'une seule matrice sans sonder l'espace conjoint.
+
+::: {.notes}
+Il est fondamental de distinguer les méthodes asymétriques (qui privilégient une matrice explicative) des méthodes symétriques comme la co-inertie qui explorent une co-structure sans hypothèse de causalité.
+:::
+
+## 4. Fondement théorique : La co-inertie
+
+<br>
+
+L'analyse de co-inertie (Dolédec & Chessel, 1994) recherche les axes unitaires $u \in \mathbb{R}^p$ et $v \in \mathbb{R}^q$ ($||u||=||v||=1$) maximisant la **covariance projetée** :
+
+$$ \max_{u, v} Cov(Xu, Yv)^2 $$
+
+<br>
+
+::: {.fragment}
+$$ Cov(Xu, Yv) = \underbrace{\sqrt{Var(Xu)}}_{\text{Inertie } X} \times \underbrace{\sqrt{Var(Yv)}}_{\text{Inertie } Y} \times \underbrace{Corr(Xu, Yv)}_{\text{Corrélation canonique}} $$
+
+<br>
+
+* **Compromis d'ordination :** Forte variance dans chaque tableau **et** forte corrélation inter-matrices.
+:::
+
+::: {.notes}
+La formule décomposée montre la robustesse de la co-inertie : elle sélectionne des axes qui sont à la fois informatifs dans chaque espace et fortement concordants entre eux.
+:::
+
+## 5. Protocole calculatoire sous R (`ade4`)
+
+<br>
+
+```{r}
+#| echo: true
+library(ade4)
+data(doubs)
+
+# 1. Définition des schémas de dualité (triplets statistiques)
+dudi_env <- dudi.pca(doubs$env, scale = TRUE, scannf = FALSE, nf = 2)
+dudi_fau <- dudi.pca(doubs$fish, scale = FALSE, scannf = FALSE, nf = 2)
+
+# 2. Diagonalisation de l'opérateur de co-inertie
+co_doubs <- coinertia(dudi_env, dudi_fau, scannf = FALSE, nf = 2)
+```
+
+<br>
+
+::: {.callout-note icon=false}
+* **Taux d'inertie Axe 1 :** `r round(co_doubs$eig[1] / sum(co_doubs$eig) * 100, 1)`% &nbsp;|&nbsp; **Axe 2 :** `r round(co_doubs$eig[2] / sum(co_doubs$eig) * 100, 1)`%
+* **Restitution globale :** Le premier plan factoriel résume **`r round(sum(co_doubs$eig[1:2]) / sum(co_doubs$eig) * 100, 1)`%** de la co-structure totale.
+:::
+
+::: {.notes}
+La quasi-totalité de l'inertie conjointe est capturée par les deux premiers axes factoriels, autorisant une interprétation bidimensionnelle directe.
+:::
+
+## 6. Espace de compromis : Analyse des résidus
+
+::: {layout-ncol=2}
+<div>
+```{r}
+#| echo: false
+#| fig-width: 5.1
+#| fig-height: 4.2
+#| fig-align: center
+par(mar = c(3.5, 3.5, 1, 1), mgp = c(2, 0.7, 0))
+
+# Gradient amont (vert) -> aval (rouge)
+cols <- colorRampPalette(c("#1b7837", "#a6d96a", "#fdae61", "#d73027"))(30)
+
+# Bornes adaptées aux deux nuages
+xlim <- range(c(co_doubs$mX[,1], co_doubs$mY[,1])) * 1.15
+ylim <- range(c(co_doubs$mX[,2], co_doubs$mY[,2])) * 1.15
+
+# Canevas principal avec axes clairs
+plot(co_doubs$mX[,1], co_doubs$mX[,2], type = "n",
+     xlim = xlim, ylim = ylim,
+     xlab = "Axe de co-inertie 1 (amont - aval)",
+     ylab = "Axe de co-inertie 2 (eutrophisation)",
+     las = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+
+# Vecteurs reliant le Milieu à la Faune
+arrows(co_doubs$mX[,1], co_doubs$mX[,2], co_doubs$mY[,1], co_doubs$mY[,2],
+       length = 0.08, col = cols, lwd = 1.8)
+
+# Points : Milieu (rond cerclé) et Faune (triangle plein)
+points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, col = "black", cex = 1.3)
+points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 1.1)
+
+# Numérotation des stations repères
+text(co_doubs$mX[,1], co_doubs$mX[,2], labels = 1:30, pos = 3, cex = 0.65, font = 2)
+
+# Légende épurée et explicite
+legend("bottomright", 
+       legend = c("Milieu attendu (X)", "Faune observée (Y)"),
+       pch = c(21, 17), pt.bg = c("grey90", "black"), col = "black",
+       bty = "o", box.col = "grey70", bg = "white", cex = 0.8)
+```
+
+<u>**Figure 1 : Espace de compromis des 30 stations du Doubs**</u>
+</div>
+
+### Lecture vectorielle
+
+* **Couleur des points :** Du vert (amont) au rouge (aval) selon les 30 stations.
+
+* **Habillage des symboles :**
+  - **● Rond cerclé :** Coordonnées environnementales ($X$).
+  - **▲ Triangle :** Coordonnées faunistiques ($Y$).
+
+* **Flèches courtes ($||y_i - x_i|| \approx 0$) :**
+  - Accord biotope $\leftrightarrow$ biocénose.
+
+* **Flèches longues (ex: stations 23-25) :**
+  - Décalage local (zones altérées / polluées).
+:::
+
+::: {.notes}
+Le graphique matérialise la distance résiduelle entre observation faunistique et prédiction environnementale. Les stations avec une flèche allongée signalent une anomalie locale.
+:::
+
+## 7. Projection des variables : Espaces $X$ et $Y$
+
+::: {layout-ncol=2}
+<div>
+```{r}
+#| echo: false
+#| fig-width: 4.8
+#| fig-height: 3.8
+#| fig-align: center
+par(mar = c(3, 3, 1, 1), mgp = c(1.8, 0.6, 0))
+lim_x <- max(abs(co_doubs$co[,1:2])) * 1.2
+plot(0, 0, type = "n", xlim = c(-lim_x, lim_x), ylim = c(-lim_x, lim_x),
+     xlab = "Axe 1", ylab = "Axe 2", las = 1, asp = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+arrows(0, 0, co_doubs$co[,1], co_doubs$co[,2], length = 0.07, col = "#2166ac", lwd = 1.6)
+text(co_doubs$co[,1], co_doubs$co[,2], labels = rownames(co_doubs$co),
+     col = "#08306b", cex = 0.8, font = 2, pos = ifelse(co_doubs$co[,1] > 0, 4, 2))
+```
+
+<u>**Figure 2a : Descripteurs abiotiques ($X$)**</u>
+
+* **Pôle amont (gauche) :** Pente (`slo`), altitude (`alt`), oxygène (`oxy`).
+* **Pôle aval (droite) :** Débit (`flo`), distance source (`dfs`), nutriments (`nit`, `pho`).
+</div>
+
+<div>
+```{r}
+#| echo: false
+#| fig-width: 4.8
+#| fig-height: 3.8
+#| fig-align: center
+par(mar = c(3, 3, 1, 1), mgp = c(1.8, 0.6, 0))
+lim_y <- max(abs(co_doubs$li[,1:2])) * 1.2
+plot(0, 0, type = "n", xlim = c(-lim_y, lim_y), ylim = c(-lim_y, lim_y),
+     xlab = "Axe 1", ylab = "Axe 2", las = 1, asp = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+arrows(0, 0, co_doubs$li[,1], co_doubs$li[,2], length = 0.07, col = "#b2182b", lwd = 1.6)
+text(co_doubs$li[,1], co_doubs$li[,2], labels = rownames(co_doubs$li),
+     col = "#67000d", cex = 0.75, font = 2, pos = ifelse(co_doubs$li[,1] > 0, 4, 2))
+```
+
+<u>**Figure 2b : Taxons piscicoles ($Y$)**</u>
+
+* **Espèces d'eau vive :** Truite (`Satr`), Vairon (`Phph`), Chabot (`Cogo`).
+* **Espèces d'eaux calmes :** Brème (`Abbr`), Gardon (`Ruru`), Tanche (`Titi`).
+</div>
+:::
+
+::: {.notes}
+La projection conjointe des variables sur les axes de co-inertie met en lumière les associations directes : les espèces d'eau froide et oxygénée s'alignent du même côté que les variables physiques de montagne, tandis que les cyprinidés d'eaux lentes s'associent aux fortes concentrations en nitrates et forts débits.
+:::
+
+## 8. Inférence scalaire : Le coefficient RV
+
+<br>
+
+Mesure globale d'association matricielle (Robert & Escoufier, 1976) :
+
+$$ RV = \frac{\text{Tr}(X X^T Y Y^T)}{\sqrt{\text{Tr}((X X^T)^2) \times \text{Tr}((Y Y^T)^2)}} \in [0, 1] $$
+
+<br>
+
+* **Interprétation :** Équivalent multivarié du coefficient de détermination ($R^2$).
+* **Propriété géométrique :** Mesure le cosinus de l'angle entre deux configurations de points.
+* **Valeur observée pour le Doubs :** **$RV = `r round(co_doubs$RV, 3)`$**
+
+::: {.notes}
+Le coefficient RV synthétise la concordance globale des deux matrices en une valeur unique comprise entre 0 et 1.
+:::
+
+## 9. Test de permutation de Monte-Carlo
+
+<br>
+
+Test d'hypothèse non paramétrique ($H_0$ : indépendance des deux tableaux) :
+
+::: {layout-ncol=2}
+### Sortie numérique
+
+```{r}
+#| echo: true
+set.seed(123)
+test_rv <- randtest(co_doubs, nrepet = 999)
+cat("RV observé :", round(test_rv$obs, 3), "\n")
+cat("P-value    :", test_rv$pvalue, "\n")
+```
+
+<br>
+
+* Rejet franc de $H_0$ ($p = 0.001$).
+* La co-structure observée n'est pas fortuite.
+
+<div>
+```{r}
+#| echo: false
+#| fig-width: 4.8
+#| fig-height: 3.8
+#| fig-align: center
+par(mar = c(3, 3, 1, 1))
+plot(test_rv, main = "")
+```
+
+<u>**Figure 3 : Distribution de randomisation sous $H_0$**</u>
+</div>
+:::
+
+::: {.notes}
+Le test par randomisation brise l'appariement des lignes 999 fois. La valeur empirique se situe très loin de la distribution aléatoire.
+:::
+
+## 10. Comparatif visuel : AFM vs Co-inertie
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 4.0
+#| fig-align: center
+kt <- ktab.list.dudi(list(env = dudi_env, fish = dudi_fau))
+mfa_doubs <- mfa(kt, scannf = FALSE, nf = 2)
+
+par(mfrow = c(1, 2), mar = c(3.2, 3.2, 1.2, 1), mgp = c(1.8, 0.6, 0))
+cols <- colorRampPalette(c("#1b7837", "#a6d96a", "#fdae61", "#d73027"))(30)
+
+# 1. Panneau AFM
+xlim_mfa <- range(c(mfa_doubs$lisup[,1], mfa_doubs$li[,1])) * 1.15
+ylim_mfa <- range(c(mfa_doubs$lisup[,2], mfa_doubs$li[,2])) * 1.15
+
+plot(0, 0, type = "n", xlim = xlim_mfa, ylim = ylim_mfa,
+     xlab = "Dimension 1", ylab = "Dimension 2", las = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+
+# Trajectoires vers le barycentre
+segments(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2],
+         mfa_doubs$li[,1], mfa_doubs$li[,2], col = "grey65", lty = 3)
+segments(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2],
+         mfa_doubs$li[,1], mfa_doubs$li[,2], col = "grey65", lty = 3)
+
+points(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2], pch = 21, bg = cols, col = "black", cex = 1.1)
+points(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2], pch = 17, col = cols, cex = 1.0)
+points(mfa_doubs$li[,1], mfa_doubs$li[,2], pch = 3, col = "black", lwd = 1.5, cex = 0.9)
+
+legend("topleft", legend = c("Milieu (partiel)", "Faune (partiel)", "Compromis (+)"),
+       pch = c(21, 17, 3), pt.bg = c("grey90", "black", NA), col = "black",
+       bty = "o", box.col = "grey75", bg = "white", cex = 0.7)
+
+# 2. Panneau Co-inertie
+xlim_co <- range(c(co_doubs$mX[,1], co_doubs$mY[,1])) * 1.15
+ylim_co <- range(c(co_doubs$mX[,2], co_doubs$mY[,2])) * 1.15
+
+plot(0, 0, type = "n", xlim = xlim_co, ylim = ylim_co,
+     xlab = "Axe de co-inertie 1", ylab = "Axe de co-inertie 2", las = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+
+arrows(co_doubs$mX[,1], co_doubs$mX[,2], co_doubs$mY[,1], co_doubs$mY[,2],
+       length = 0.07, col = cols, lwd = 1.6)
+points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, col = "black", cex = 1.1)
+points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 1.0)
+
+legend("bottomright", legend = c("Milieu attendu", "Faune observée"),
+       pch = c(21, 17), pt.bg = c("grey90", "black"), col = "black",
+       bty = "o", box.col = "grey75", bg = "white", cex = 0.7)
+```
+
+::: {layout-ncol=2}
+<div>
+<u>**Figure 4a : AFM (synthèse par barycentre)**</u>
+
+* **Objectif :** Résumer un compromis moyen entre tableaux.
+* **Limite :** Les écarts sont amortis par la projection vers le centre moyen (effet d'atténuation).
+</div>
+
+<div>
+<u>**Figure 4b : Co-inertie (couplage vectoriel direct)**</u>
+
+* **Objectif :** Maximiser la covariance croisée directe ($X \leftrightarrow Y$).
+* **Force :** Isole directement l'amplitude et le sens du découplage écologique station par station.
+</div>
+:::
+
+::: {.notes}
+Argument clé pour l'oral : L'AFM cherche à résumer tout le monde autour d'une moyenne (barycentre). La Co-inertie, elle, cherche la dimension écologique commune qui maximise la covariance. Elle ne fait pas de moyenne : elle trace la trajectoire réelle du milieu vers le vivant. Dans les sols soumis à dilution, cela permet de voir immédiatement à quel stade le filtre environnemental s'effondre face à la dérive stochastique.
+:::
+
+## 11. Propriétés métriques & Précautions
+
+::: {layout-ncol=2}
+### Atouts méthodologiques
+- **Condition $p + q > n$ :** Opère sans saturation en grande dimension (omiques, microbiome).
+- **Pas d'inversion matricielle :** Insensible à la multicolinéarité stricte.
+- **Universalité :** Couple ACP, AFC, ACM ou PCoA via les triplets statistiques.
+
+### Précautions d'usage
+- **Descriptif :** Pas de modèle prédictif directionnel direct ($Y \neq f(X)$).
+- **Sensibilité :** Vulnérable aux points aberrants à forte inertie (*outliers*).
+:::
+
+::: {.notes}
+Contrairement aux analyses canoniques traditionnelles qui nécessitent l'inversion de matrices de covariance, la co-inertie ne bloque jamais en cas de dimension supérieure aux individus.
+:::
+
+## 12. Synthèse épistémologique
+
+<br>
+
+* **Dualité théorique :** Compromis optimal entre inertie interne et corrélation canonique.
+
+<br>
+
+* **Outil diagnostique :** Le plan de compromis isole visuellement les consensus écologiques et les anomalies locales (résidus).
+
+<br>
+
+* **Robustesse statistique :** Validation non paramétrique par le coefficient $RV$ et test de permutations.
+
+::: {.notes}
+En résumé, la co-inertie est l'outil de référence pour explorer la structure conjointe de matrices appariées, alliant rigueur mathématique et pertinence biologique.
+:::
