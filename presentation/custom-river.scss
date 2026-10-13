@@ -1,0 +1,233 @@
+/* custom-river.scss - Thème Quarto/Reveal.js Écologie Fluviale & Ichtyologie (Ultra-Moderne) */
+
+/*-- scss:defaults --*/
+
+// Palette aquatique & écologique épurée
+$theme-navy: #0b253a;          // Bleu océan profond / minéral
+$theme-teal: #0d7377;          // Bleu sarcelle / rivière vive
+$theme-cyan: #14ffec;          // Cyan néon subtil
+$theme-emerald: #10b981;       // Vert ripisylve
+$theme-sand: #f8fafc;          // Fond très clair écume / galets
+$theme-slate: #1e293b;         // Texte principal
+$theme-muted: #64748b;         // Texte secondaire
+$theme-amber: #f59e0b;         // Transition
+$theme-salmon: #f43f5e;        // Accent faunistique / rouge saumon
+
+// Reveal.js configuration
+$body-bg: #f8fafc;
+$body-color: $theme-slate;
+$main-color: $theme-slate;
+$heading-color: $theme-navy;
+$link-color: $theme-teal;
+$selection-bg: rgba(13, 115, 119, 0.2);
+
+// Typographie moderne et premium
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+$font-family-sans-serif: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-family-monospace: 'JetBrains Mono', monospace;
+$presentation-heading-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$presentation-font-size-root: 27px;
+
+/*-- scss:rules --*/
+
+// Titres modernes avec dégradé subtil
+.reveal h1, .reveal h2, .reveal h3 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.reveal h1 {
+  background: linear-gradient(135deg, #0b253a 0%, #0d7377 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  padding-bottom: 0.2em;
+}
+
+.reveal h2 {
+  color: #0b253a;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.7em;
+  position: relative;
+}
+
+.reveal h2::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #0d7377, #14ffec);
+}
+
+// Accentuation
+.reveal strong {
+  color: #0b253a;
+  font-weight: 700;
+}
+
+.reveal em {
+  color: #0d7377;
+  font-style: normal;
+  font-weight: 600;
+}
+
+// Cartes et Callouts "Glassmorphism"
+.reveal .callout {
+  border-radius: 12px;
+  border-left-width: 5px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px -2px rgba(11, 37, 58, 0.08);
+  border-top: 1px solid #f1f5f9;
+  border-right: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.reveal .callout.callout-note {
+  border-left-color: #0d7377;
+  background: #f0fdfa;
+}
+
+// Tableaux modernes façon SaaS / Design System
+.reveal table {
+  font-size: 0.8em;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px -3px rgba(11, 37, 58, 0.07);
+  margin: 0.8em auto;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.reveal table th {
+  background: #0b253a;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.6em 0.9em;
+  text-align: center;
+  border: none;
+  font-size: 0.88em;
+  letter-spacing: 0.02em;
+}
+
+.reveal table td {
+  padding: 0.5em 0.9em;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.reveal table tr:last-child td {
+  border-bottom: none;
+}
+
+.reveal table tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.reveal table tr:hover td {
+  background: #f1f5f9;
+}
+
+// Blocs de code épurés
+.reveal pre {
+  box-shadow: 0 6px 18px -4px rgba(11, 37, 58, 0.1);
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.reveal pre code {
+  font-size: 0.74em;
+  line-height: 1.4;
+  color: #0f172a;
+}
+
+// Boîte de synthèse moderne (Card)
+.summary-box {
+  background: #ffffff;
+  border-radius: 12px;
+  border-left: 5px solid #0d7377;
+  padding: 0.9em 1.2em;
+  box-shadow: 0 4px 16px -2px rgba(11, 37, 58, 0.07);
+  border-top: 1px solid #f1f5f9;
+  border-right: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  margin: 0.8em 0;
+}
+
+// Mini badges modernes
+.badge-eco {
+  display: inline-block;
+  padding: 0.25em 0.7em;
+  font-size: 0.76em;
+  font-weight: 700;
+  border-radius: 20px;
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+.badge-fish {
+  display: inline-block;
+  padding: 0.25em 0.7em;
+  font-size: 0.76em;
+  font-weight: 700;
+  border-radius: 20px;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.caption-custom {
+  font-size: 0.8em;
+  font-weight: 600;
+  color: #0d7377;
+  margin-top: 0.4em;
+  text-align: center;
+}
+
+// Carte interactive Leaflet
+.leaflet-container {
+  border-radius: 10px;
+  box-shadow: 0 4px 15px -3px rgba(11, 37, 58, 0.1);
+  border: 1px solid #cbd5e1;
+}
+
+// Sommaire moderne
+.agenda-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0.9em 1.1em;
+  margin-bottom: 0.8em;
+  border-left: 5px solid #0d7377;
+  border-top: 1px solid #f1f5f9;
+  border-right: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  box-shadow: 0 4px 12px -2px rgba(11, 37, 58, 0.06);
+}
+
+.agenda-num {
+  font-weight: 800;
+  color: #0d7377;
+  font-size: 1.1em;
+  margin-right: 0.4em;
+}
+
+.agenda-title {
+  font-weight: 700;
+  color: #0b253a;
+  font-size: 0.95em;
+}
+
+.agenda-desc {
+  font-size: 0.78em;
+  color: #64748b;
+  margin-top: 0.3em;
+  line-height: 1.35;
+}
+
