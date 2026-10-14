@@ -242,10 +242,10 @@ Le tableau Y contient 27 espèces mesurées sur les 30 mêmes stations. L'ACP es
 
 ## 4. Fondement théorique : Maximisation de la co-inertie
 
-<div class="cours-box box-theo" style="margin: 0.3em 0;">
+<div class="cours-box box-theo" style="margin: 0.35em 0; padding: 0.75em 1.1em;">
 <div class="cours-box-header">Théorème fondamental (Dolédec & Chessel, 1994)</div>
 Soient deux triplets statistiques $(X, Q_X, D)$ et $(Y, Q_Y, D)$. L'analyse de co-inertie détermine le couple d'axes factoriels $(u, v)$ normés ($u^T Q_X u = v^T Q_Y v = 1$) maximisant la covariance projetée :
-<p style="text-align: center; margin: 0.25em 0; font-size: 1.05em; font-weight: 600;">
+<p style="text-align: center; margin: 0.35em 0; font-size: 1.18em; font-weight: 700; color: #0b253a;">
 $$ \operatorname{Cov}^2(Xu, Yv) = \underbrace{\operatorname{Var}(Xu)}_{\text{Inertie propre } X} \times \underbrace{\operatorname{Var}(Yv)}_{\text{Inertie propre } Y} \times \underbrace{\operatorname{Corr}^2(Xu, Yv)}_{\text{Corrélation canonique}} $$
 </p>
 </div>
@@ -360,10 +360,12 @@ Cette figure justifie rigoureusement le choix de 2 dimensions : les deux premier
 <div class="cours-box box-def">
 <div class="cours-box-header">Coefficient $RV$ (Escoufier, 1973)</div>
 
+<p style="text-align: center; font-size: 1.08em; font-weight: 700; margin: 0.25em 0;">
 $$ RV = \frac{\operatorname{Tr}(X Q_X X^T D Y Q_Y Y^T D)}{\sqrt{\operatorname{Tr}((X Q_X X^T D)^2) \times \operatorname{Tr}((Y Q_Y Y^T D)^2)}} \in [0, 1] $$
+</p>
 
-* **Sens mathématique :** Cosinus de l'angle entre les deux configurations d'opérateurs projectifs ($R^2$ multivarié).
-* **Valeur observée (Doubs) :** <span class="badge-eco" style="font-size: 0.82em; font-weight: 800;">RV = 0.451</span>
+* **Sens mathématique :** Cosinus de l'angle entre configurations d'opérateurs ($R^2$ multivarié).
+* **Valeur observée (Doubs) :** <span class="badge-eco" style="font-size: 0.92em; font-weight: 800; padding: 0.2em 0.6em;">RV = 0.451</span>
 * **Interprétation :** Intensité de couplage très élevée pour un écosystème naturel ouvert.
 </div>
 
@@ -679,8 +681,8 @@ Ce tableau synthétique résume les atouts et limites : la co-inertie excelle qu
 
 ::::
 
-<div class="cours-box box-theo" style="margin-top: 0.5em; text-align: center; font-weight: 600;">
-La co-inertie constitue une référence méthodologique pour le couplage de matrices multidimensionnelles hétérogènes en sciences de l'environnement.
+<div class="cours-box box-theo" style="margin-top: 0.55em; padding: 0.8em 1.2em; text-align: center; font-size: 1.02em; font-weight: 700; color: #0b253a;">
+La co-inertie s'impose comme la méthode d'ordination multitableaux de référence pour relier des matrices multidimensionnelles hétérogènes sans contrainte de rang ni de dimension.
 </div>
 
 ::: {.notes}

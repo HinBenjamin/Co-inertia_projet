@@ -21,37 +21,37 @@ $heading-color: $theme-navy;
 $link-color: $theme-teal;
 $selection-bg: rgba(13, 115, 119, 0.2);
 
-// Typographie moderne et premium
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+// Typographie haute lisibilité spéciale Vidéoprojection (Inter & Roboto Slab)
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto+Slab:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
-$font-family-sans-serif: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-family-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 $font-family-monospace: 'JetBrains Mono', monospace;
-$presentation-heading-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-$presentation-font-size-root: 23px;
+$presentation-heading-font: 'Roboto Slab', Georgia, serif;
+$presentation-font-size-root: 24.5px;
 
 /*-- scss:rules --*/
 
-// Titres modernes
+// Titres académiques nets & formels
 .reveal h1, .reveal h2, .reveal h3 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-family: 'Roboto Slab', Georgia, serif;
+  letter-spacing: -0.015em;
 }
 
 .reveal h1 {
-  background: linear-gradient(135deg, #0b253a 0%, #0d7377 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0b253a;
   padding-bottom: 0.2em;
-  font-size: 1.8em;
+  font-size: 1.85em;
+  font-weight: 700;
+  line-height: 1.18;
 }
 
 .reveal h2 {
   color: #0b253a;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid #cbd5e1;
   padding-bottom: 0.25em;
-  margin-bottom: 0.65em;
-  font-size: 1.25em;
+  margin-bottom: 0.55em;
+  font-size: 1.26em;
+  font-weight: 700;
   position: relative;
 }
 
@@ -60,29 +60,31 @@ $presentation-font-size-root: 23px;
   position: absolute;
   bottom: -2px;
   left: 0;
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, #0d7377, #14ffec);
+  width: 75px;
+  height: 2.5px;
+  background: #0d7377;
 }
 
 .reveal p, .reveal ul, .reveal ol {
-  margin-bottom: 0.5em;
+  margin-bottom: 0.40em;
   line-height: 1.45;
+  color: #1e293b;
 }
 
 .reveal ul, .reveal ol {
-  font-size: 0.92em;
-  margin-top: 0.25em;
+  font-size: 0.94em;
+  margin-top: 0.2em;
+  padding-left: 1.2em;
 }
 
 .reveal li {
-  margin-bottom: 0.35em;
+  margin-bottom: 0.28em;
 }
 
 // Accentuation
 .reveal strong {
-  color: #0b253a;
-  font-weight: 700;
+  color: #071725;
+  font-weight: 750;
 }
 
 .reveal em {
@@ -91,12 +93,12 @@ $presentation-font-size-root: 23px;
   font-weight: 600;
 }
 
-// Cartes et Callouts "Glassmorphism"
+// Cartes et Callouts
 .reveal .callout {
   border-radius: 8px;
   border-left-width: 4px;
   background: #ffffff;
-  box-shadow: 0 3px 12px -2px rgba(11, 37, 58, 0.06);
+  box-shadow: 0 2px 8px -2px rgba(11, 37, 58, 0.05);
   border-top: 1px solid #f1f5f9;
   border-right: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
@@ -110,34 +112,34 @@ $presentation-font-size-root: 23px;
   background: #f0fdfa;
 }
 
-// Tableaux modernes façon SaaS
+// Tableaux académiques épurés (Style Booktabs / High-contrast)
 .reveal table {
   font-size: 0.74em;
   border-collapse: separate;
   border-spacing: 0;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 14px -2px rgba(11, 37, 58, 0.06);
-  margin: 0.45em auto;
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px -2px rgba(11, 37, 58, 0.05);
+  margin: 0.4em auto;
+  border: 1px solid #cbd5e1;
   background: #ffffff;
 }
 
 .reveal table th {
-  background: #0b253a;
+  background: #0f172a;
   color: #ffffff;
   font-weight: 700;
-  padding: 0.45em 0.7em;
+  padding: 0.50em 0.75em;
   text-align: center;
   border: none;
   font-size: 0.88em;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
 .reveal table td {
-  padding: 0.4em 0.65em;
+  padding: 0.42em 0.70em;
   border-bottom: 1px solid #f1f5f9;
-  color: #334155;
+  color: #1e293b;
 }
 
 .reveal table tr:last-child td {
@@ -148,43 +150,44 @@ $presentation-font-size-root: 23px;
   background: #f8fafc;
 }
 
-// Blocs de code épurés
+// Blocs de code
 .reveal pre {
-  box-shadow: 0 4px 12px -3px rgba(11, 37, 58, 0.08);
+  box-shadow: 0 3px 10px -2px rgba(11, 37, 58, 0.07);
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #cbd5e1;
   background: #ffffff;
-  margin: 0.4em 0;
+  margin: 0.35em 0;
 }
 
 .reveal pre code {
-  font-size: 0.84em;
-  line-height: 1.35;
+  font-size: 0.82em;
+  line-height: 1.34;
   color: #0f172a;
   padding: 0.55em 0.85em;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 // Boîte de synthèse moderne (Card)
 .summary-box {
   background: #ffffff;
-  border-radius: 9px;
+  border-radius: 8px;
   border-left: 5px solid #0d7377;
   padding: 0.65em 0.95em;
-  box-shadow: 0 4px 14px -2px rgba(11, 37, 58, 0.06);
+  box-shadow: 0 2px 10px -2px rgba(11, 37, 58, 0.05);
   border-top: 1px solid #f1f5f9;
   border-right: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
-  margin: 0.45em 0;
-  font-size: 0.88em;
-  line-height: 1.46;
+  margin: 0.40em 0;
+  font-size: 0.86em;
+  line-height: 1.45;
 }
 
 .mini-card {
   background: #ffffff;
   border-radius: 8px;
   padding: 0.55em 0.85em;
-  box-shadow: 0 3px 10px -2px rgba(11, 37, 58, 0.05);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px -2px rgba(11, 37, 58, 0.05);
+  border: 1px solid #cbd5e1;
   margin: 0.35em 0;
   font-size: 0.86em;
   line-height: 1.42;
@@ -194,16 +197,16 @@ $presentation-font-size-root: 23px;
 .cours-box {
   background: #ffffff;
   border-radius: 8px;
-  padding: 0.6em 0.9em;
-  margin: 0.4em 0;
-  box-shadow: 0 3px 12px -2px rgba(11, 37, 58, 0.06);
-  font-size: 0.86em;
-  line-height: 1.45;
+  padding: 0.65em 1.0em;
+  margin: 0.40em 0;
+  box-shadow: 0 2px 10px -2px rgba(11, 37, 58, 0.05);
+  font-size: 0.92em;
+  line-height: 1.48;
   border: 1px solid #e2e8f0;
 }
 
 .box-def {
-  border-left: 5px solid #0b253a;
+  border-left: 5px solid #0f172a;
   background: #f8fafc;
 }
 
@@ -213,12 +216,12 @@ $presentation-font-size-root: 23px;
 }
 
 .box-prop {
-  border-left: 5px solid #2563eb;
+  border-left: 5px solid #1e40af;
   background: #eff6ff;
 }
 
 .box-app {
-  border-left: 5px solid #10b981;
+  border-left: 5px solid #059669;
   background: #f0fdf4;
 }
 
@@ -228,27 +231,26 @@ $presentation-font-size-root: 23px;
 }
 
 .cours-box-header {
-  font-weight: 800;
+  font-weight: 750;
   font-size: 0.92em;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 0.35em;
-  display: flex;
-  align-items: center;
-  gap: 0.4em;
+  padding-bottom: 0.18em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-.box-def .cours-box-header { color: #0b253a; }
+.box-def .cours-box-header { color: #0f172a; }
 .box-theo .cours-box-header { color: #0d7377; }
-.box-prop .cours-box-header { color: #1d4ed8; }
-.box-app .cours-box-header { color: #047857; }
+.box-prop .cours-box-header { color: #1e40af; }
+.box-app .cours-box-header { color: #059669; }
 .box-rem .cours-box-header { color: #b45309; }
 
 // Mini badges modernes
 .badge-eco {
   display: inline-block;
   padding: 0.15em 0.5em;
-  font-size: 0.72em;
+  font-size: 0.76em;
   font-weight: 700;
   border-radius: 12px;
   background: #ccfbf1;
@@ -259,7 +261,7 @@ $presentation-font-size-root: 23px;
 .badge-fish {
   display: inline-block;
   padding: 0.15em 0.5em;
-  font-size: 0.72em;
+  font-size: 0.76em;
   font-weight: 700;
   border-radius: 12px;
   background: #fee2e2;
@@ -268,10 +270,10 @@ $presentation-font-size-root: 23px;
 }
 
 .caption-custom {
-  font-size: 0.75em;
+  font-size: 0.80em;
   font-weight: 600;
   color: #0d7377;
-  margin-top: 0.25em;
+  margin-top: 0.30em;
   margin-bottom: 0.2em;
   text-align: center;
 }
@@ -282,7 +284,7 @@ $presentation-font-size-root: 23px;
   flex-direction: column;
   gap: 1.1em;
   margin-top: 1.2em;
-  max-width: 950px;
+  max-width: 980px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -304,7 +306,7 @@ $presentation-font-size-root: 23px;
 .sommaire-badge {
   font-weight: 800;
   color: #0d7377;
-  font-size: 1.2em;
+  font-size: 1.25em;
   min-width: 2.4em;
   height: 2.4em;
   display: flex;
@@ -323,12 +325,12 @@ $presentation-font-size-root: 23px;
 .sommaire-item-title {
   font-weight: 700;
   color: #0b253a;
-  font-size: 1.08em;
+  font-size: 1.12em;
   margin-bottom: 0.2em;
 }
 
 .sommaire-item-desc {
-  font-size: 0.84em;
+  font-size: 0.88em;
   color: #475569;
   line-height: 1.45;
   margin: 0;
@@ -339,9 +341,9 @@ $presentation-font-size-root: 23px;
   background: #f0fdf4;
   border-left: 5px solid #16a34a;
   border-radius: 9px;
-  padding: 0.7em 1.0em;
-  font-size: 0.86em;
-  line-height: 1.46;
+  padding: 0.75em 1.05em;
+  font-size: 0.90em;
+  line-height: 1.48;
   box-shadow: 0 4px 14px -2px rgba(22, 163, 74, 0.08);
 }
 
@@ -349,8 +351,8 @@ $presentation-font-size-root: 23px;
   background: #fff1f2;
   border-left: 5px solid #e11d48;
   border-radius: 9px;
-  padding: 0.7em 1.0em;
-  font-size: 0.86em;
-  line-height: 1.46;
+  padding: 0.75em 1.05em;
+  font-size: 0.90em;
+  line-height: 1.48;
   box-shadow: 0 4px 14px -2px rgba(225, 29, 72, 0.08);
 }
