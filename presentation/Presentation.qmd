@@ -16,9 +16,6 @@ format:
     controls: true
     keyboard: true
     overview: true
-    width: 1280
-    height: 720
-    margin: 0.05
     highlight-style: github
 execute: 
   echo: true
@@ -32,30 +29,30 @@ execute:
 <div>
 <div class="agenda-card">
   <div><span class="agenda-num">I.</span><span class="agenda-title">Contexte & Données écologiques</span></div>
-  <div class="agenda-desc">Réseau hydrographique du Doubs, matrice Milieu ($X$) aux unités réelles et matrice Faune ($Y$), ordinations préliminaires.</div>
+  <div class="agenda-desc">Réseau hydrographique du Doubs, matrice Milieu ($X$) et matrice Faune ($Y$), ordinations séparées par ACP.</div>
 </div>
 
 <div class="agenda-card">
-  <div><span class="agenda-num">II.</span><span class="agenda-title">Fondements théoriques & Décomposition spectrale</span></div>
-  <div class="agenda-desc">Échec de 2 ACP isolées, compromis variance-corrélation, éboulis de co-inertie et corrélations par dimension.</div>
+  <div><span class="agenda-num">II.</span><span class="agenda-title">Fondements de la Co-inertie</span></div>
+  <div class="agenda-desc">Approches symétriques vs asymétriques, compromis variance-corrélation, mise en œuvre sous R (`ade4`).</div>
 </div>
 </div>
 
 <div>
 <div class="agenda-card">
-  <div><span class="agenda-num">III.</span><span class="agenda-title">Inférence statistique préalable : RV & Monte-Carlo</span></div>
-  <div class="agenda-desc">Signification géométrique du coefficient $RV$, test de permutation sous $H_0$ pour valider la co-structure avant ordination.</div>
+  <div><span class="agenda-num">III.</span><span class="agenda-title">Résultats & Continuum fluvial</span></div>
+  <div class="agenda-desc">Espace de compromis (résidus stationnels), projection des variables et validation de la zonation de Huet.</div>
 </div>
 
 <div class="agenda-card">
-  <div><span class="agenda-num">IV.</span><span class="agenda-title">Exploration graphique & Synthèse écologique</span></div>
-  <div class="agenda-desc">Espace de compromis des stations, gradient de pollution moléculaire, continuum de Huet/RCC, benchmark AFM et bilan Pour/Contre.</div>
+  <div><span class="agenda-num">IV.</span><span class="agenda-title">Validation, Comparaisons & Synthèse</span></div>
+  <div class="agenda-desc">Coefficient $RV$ et test de Monte-Carlo, benchmark AFM vs Co-inertie, propriétés métriques et perspectives.</div>
 </div>
 </div>
 :::
 
 ::: {.notes}
-Voici le plan de notre exposé articulé en 4 étapes logiques : nous commençons par le cadre écologique et les matrices appariées avec leurs unités physiques réelles. Nous détaillons ensuite le fondement théorique et la décomposition spectrale. Avant toute interprétation graphique, nous validons rigoureusement la liaison par le coefficient RV et le test de permutation de Monte-Carlo. Enfin, nous interprétons les compromis stationnels, les gradients chimiques de pollution, la zonation de Huet, et concluons par les atouts et limites de la méthode.
+Voici le plan de notre exposé articulé en 4 étapes : nous commencerons par le cadre écologique et les matrices appariées, puis nous détaillerons les fondements théoriques de la co-inertie. Ensuite, nous analyserons les résultats en lien avec le continuum fluvial du Doubs, avant de conclure par la validation statistique et la comparaison méthodologique avec l'AFM.
 :::
 
 ## 1. Contexte & Localisation : La rivière du Doubs
@@ -67,47 +64,53 @@ Dispositif d'étude de référence (**Verneaux, 1973**) :
 * **Bassin versant :** Massif du Jura & frontière franco-suisse.
 * **Trajectoire fluviale :** 
   - **Source :** Mouthe (altitude 934 m, Jura).
-  - **Boucle helvétique :** Clos du Doubs (Saint-Ursanne).
-  - **Exutoire :** Confluence avec la Saône à Verdun-sur-le-Doubs (172 m).
-* **Profil spatial :** Longueur ~453 km sur **$n = 30$ stations** d'échantillonnage appariées.
+  - **Boucle suisse :** Traversée du Clos du Doubs (Saint-Ursanne).
+  - **Exutoire :** Confluence avec la Saône à Verdun-sur-le-Doubs (altitude 172 m).
+* **Longueur totale :** ~453 km parcourus sur **$n = 30$ stations** d'échantillonnage.
 
 <div class="summary-box">
-**Question écologique :** Comment la transition morphodynamique (amont $\rightarrow$ aval) et les rejets anthropiques locaux structurent-ils la distribution des communautés piscicoles ?
+**Question écologique :** Comment la transition morphodynamique (amont $\rightarrow$ aval) et les pressions anthropiques locales structurent-elles la distribution des peuplements piscicoles ?
 </div>
 </div>
 
 <div>
 ```{r}
-#| echo: true
-#| fig-width: 5.4
-#| fig-height: 4.0
+#| echo: false
+#| fig-width: 5.2
+#| fig-height: 4.2
 #| fig-align: center
 library(ade4)
 data(doubs)
 
-par(mar = c(3, 3, 1.8, 1), mgp = c(1.8, 0.6, 0))
+par(mar = c(3.5, 3.5, 2, 1), mgp = c(2, 0.7, 0))
+# Coordonnées géographiques de la rivière (profil spatial 30 stations)
 cols_grad <- colorRampPalette(c("#0d7377", "#14ffec", "#f59e0b", "#f43f5e"))(30)
 plot(doubs$xy$x, doubs$xy$y, type = "n",
      xlab = "Coordonnée X (km relatif)", ylab = "Coordonnée Y (km relatif)",
      main = "Trajectoire spatiale du Doubs (30 stations)", las = 1)
 grid(col = "grey90")
-lines(doubs$xy$x, doubs$xy$y, col = "#0d7377", lwd = 3)
-points(doubs$xy$x, doubs$xy$y, pch = 21, bg = cols_grad, col = "#0b253a", cex = 1.3, lwd = 1.2)
-text(doubs$xy$x, doubs$xy$y, labels = 1:30, pos = c(rep(3, 10), rep(4, 10), rep(1, 10)), cex = 0.68, font = 2)
-legend("topleft", legend = c("Source (Mouthe, St. 1)", "Boucle suisse (St. 16)", "Aval / Plaine (St. 30)"),
-       pch = 21, pt.bg = c(cols_grad[1], cols_grad[16], cols_grad[30]), bty = "o", box.col = "#cbd5e1", bg = "white", cex = 0.7)
+lines(doubs$xy$x, doubs$xy$y, col = "#0d7377", lwd = 3.5, lty = 1)
+points(doubs$xy$x, doubs$xy$y, pch = 21, bg = cols_grad, col = "#0b253a", cex = 1.4, lwd = 1.3)
+text(doubs$xy$x, doubs$xy$y, labels = 1:30, pos = c(rep(3, 10), rep(4, 10), rep(1, 10)), cex = 0.72, font = 2, col = "#0b253a")
+
+legend("topleft", 
+       legend = c("Source (Mouthe, St. 1)", "Boucle suisse (St. 16)", "Aval / Plaine (St. 30)", "Cours d'eau"),
+       pch = c(21, 21, 21, NA), lty = c(NA, NA, NA, 1), lwd = c(NA, NA, NA, 3),
+       pt.bg = c(cols_grad[1], cols_grad[16], cols_grad[30], NA),
+       col = c("#0b253a", "#0b253a", "#0b253a", "#0d7377"),
+       bty = "o", box.col = "#cbd5e1", bg = "white", cex = 0.72)
 ```
-<p class="caption-custom">Figure 0 : Parcours amont $\rightarrow$ aval des 30 stations échantillonnées</p>
+<p class="caption-custom">Figure 0 : Trajectoire amont $\rightarrow$ aval des 30 stations du Doubs</p>
 </div>
 :::
 
 ::: {.notes}
-Le dispositif de Verneaux (1973) suit 30 stations le long des 453 km du Doubs, de la source montagnarde jurassienne à Mouthe jusqu'à la confluence de la Saône, en passant par la boucle suisse.
+Présentons d'abord le cadre écologique : le réseau du Doubs de Verneaux (1973). On suit les 30 stations le long de la rivière, de la source jurassienne (Mouthe) jusqu'à la plaine de Saône, en passant par la boucle helvétique.
 :::
 
 ## 2. Données d'étude : Matrice Milieu ($X$)
 
-Caractérisation abiotique du milieu fluvial (**$n = 30$ stations**, 11 variables environnementales) :
+Caractérisation abiotique du milieu fluvial (**$n = 30$ stations**, 11 variables) :
 
 ```{r}
 #| echo: false
@@ -115,480 +118,478 @@ library(ade4)
 library(knitr)
 data(doubs)
 
-# Restitution dans les unités physiques et écologiques réelles :
-env_real <- head(doubs$env, 5)
-env_disp <- data.frame(
-  "Station"   = paste("St.", 1:5),
-  "dfs (km)"  = env_real$dfs / 10,
-  "alt (m)"   = env_real$alt,
-  "slo (index)"= env_real$slo,
-  "flo (m³/s)"= env_real$flo / 100,
-  "pH"        = env_real$pH / 10,
-  "har (mg/L)"= env_real$har,
-  "oxy (mg/L)"= env_real$oxy / 10,
-  "nit (mg/L)"= env_real$nit / 100,
-  "amm (mg/L)"= env_real$amm / 100,
-  "pho (mg/L)"= env_real$pho / 100,
-  "bdo (mg/L)"= env_real$bdo / 10,
-  check.names = FALSE
-)
-kable(env_disp, align = "c")
+env_sub <- head(doubs$env[, c("dfs", "alt", "slo", "flo", "pH", "oxy", "nit", "pho")], 5)
+colnames(env_sub) <- c("Dist. source (km)", "Altitude (m)", "Pente (%)", "Débit (m³/s)", "pH", "Oxygène", "Nitrates", "Phosphates")
+rownames(env_sub) <- paste("Station", 1:5)
+
+kable(env_sub)
 ```
 
-<p class="caption-custom">Tableau 1a : Matrice $X$ — Descripteurs physico-chimiques et morphologiques aux unités réelles (30 × 11)</p>
+<p class="caption-custom">Tableau 1a : Matrice $X$ — Descripteurs physico-chimiques et géomorphologiques (30 × 11)</p>
 
 ::: {layout-ncol=2}
-* **Unités physiques & réglage des variables :**
-  - Dans `ade4::doubs$env`, les valeurs sont encodées brutes ($\times 10$ pour pH, oxygène et DBO ; $\times 100$ pour débit, nitrates, ammonium, phosphates).
-  - Restituées ici : **pH réel de 7.9 à 8.3**, débit en **m³/s**, oxygène et nutriments en **mg/L**.
-  - Pente `slo` = $\ln(1 + \text{pente } ‰ \times 100)$ ; Dureté `har` en mg Ca²⁺/L.
+* **Nature des variables :** Variables quantitatives continues d'unités hétérogènes (mètres, %, m³/s, mg/L).
+* **Typologie des gradients :** Pente et altitude (forces érosives amont) vs débit et nutriments (charge dissoute aval).
 
-* **Ordination préliminaire :**
-  - **ACP normée** : `dudi.pca(doubs$env, scale = TRUE, scannf = FALSE, nf = 2)`.
-  - **Justification statistique :** Variables continues d'unités hétérogènes (mètres, m³/s, mg/L). La standardisation centrée-réduite évite que les fortes valeurs d'altitude n'écrasent les concentrations chimiques.
+* **Ordination préliminaire :** **ACP normée** (`dudi.pca(..., scale = TRUE)`).
+* **Justification statistique :** Standardisation centrée-réduite indispensable pour annuler les effets d'échelle métrique.
 :::
 
 ::: {.notes}
-Attention au piège classique du jeu de données Doubs : ade4 stocke le pH multiplié par 10 (79 pour 7.9), et les nutriments multipliés par 100. Nous les avons convertis en unités réelles. L'ACP normée est obligatoire car les grandeurs ont des unités hétérogènes.
+Le premier tableau X regroupe les conditions physiques et chimiques. Sur 30 stations, 11 variables hétérogènes (mètres, mg/L). L'ACP normée est obligatoire pour éviter que les altitudes écrasent les variations subtiles d'oxygène ou de nutriments.
 :::
 
 ## 3. Données d'étude : Matrice Faune piscicole ($Y$)
 
-Mesures appariées de la communauté ichtyologique (**$n = 30$ mêmes stations**, 27 espèces de poissons) :
+Mesures appariées de la communauté ichtyologique (**$n = 30$ stations**, 27 espèces de poissons) :
 
 ```{r}
 #| echo: false
-fish_sub <- head(doubs$fish[, c("Satr", "Phph", "Neba", "Cogo", "Thth", "Eslu", "Abbr", "Ruru", "Titi", "Alal")], 5)
-colnames(fish_sub) <- c("Truite (Satr)", "Vairon (Phph)", "Loche (Neba)", "Chabot (Cogo)", "Ombre (Thth)", 
-                        "Brochet (Eslu)", "Brème (Abbr)", "Gardon (Ruru)", "Tanche (Titi)", "Ablette (Alal)")
-rownames(fish_sub) <- paste("St.", 1:5)
-kable(fish_sub, align = "c")
+fish_sub <- head(doubs$fish[, c("Satr", "Phph", "Neba", "Thth", "Eslu", "Abbr", "Ruru", "Titi")], 5)
+colnames(fish_sub) <- c("Truite (Satr)", "Vairon (Phph)", "Loche (Neba)", "Ombre (Thth)", "Brochet (Eslu)", "Brème (Abbr)", "Gardon (Ruru)", "Tanche (Titi)")
+rownames(fish_sub) <- paste("Station", 1:5)
+
+kable(fish_sub)
 ```
 
 <p class="caption-custom">Tableau 1b : Matrice $Y$ — Abondances de la communauté ichtyologique (30 stations × 27 espèces)</p>
 
 ::: {layout-ncol=2}
-* **Nature des variables & Unité :**
-  - **Classes d'abondance semi-quantitatives discrètes** de Kot :
-    - $0$ = absence, $1$ = très rare, $2$ = rare, $3$ = commun, $4$ = abondant, $5$ = très abondant.
-  - Même échelle pour les 27 espèces (sans unité physique dimensionnelle).
+* **Nature des variables :** Abondances semi-quantitatives discrètes en classes (0 = absence à 5 = très abondant).
+* **Composition fonctionnelle :** Du cortège salmonicole rhéophile d'eaux vives aux cyprinidés limnophiles d'eaux calmes.
 
-* **Ordination préliminaire :**
-  - **ACP centrée non normée** : `dudi.pca(doubs$fish, scale = FALSE, scannf = FALSE, nf = 2)`.
-  - **Justification biologique :** Comme toutes les espèces partagent la même unité de comptage, on ne réduit pas la variance afin de **conserver les abondances relatives réelles** et le poids écologique des espèces dominantes face aux espèces rares.
+* **Ordination préliminaire :** **ACP centrée non normée** (`scale = FALSE`).
+* **Justification biologique :** Conserve la variance biologique réelle et les abondances relatives entre espèces dominantes et rares.
 :::
 
 ::: {.notes}
-Pour la faune Y, les données sont semi-quantitatives en classes d'abondance de 0 à 5. Même unité partout : on fait une ACP centrée mais non normée pour respecter la prépondérance des espèces abondantes sur les espèces rares.
+Le second tableau Y contient le peuplement de poissons : 27 espèces échantillonnées sur les mêmes 30 stations. Données de même unité (classes d'abondances). On réalise une ACP simplement centrée pour préserver l'écart entre espèces très abondantes et rares.
 :::
 
-## 4. Du schéma isolé au couplage structural : Pourquoi la Co-inertie ?
+## 4. Du schéma isolé au couplage structural
 
 <br>
 
-Pourquoi ne pas simplement comparer deux ACP indépendantes ?
+Deux visions méthodologiques pour lier deux tableaux écologiques appariés :
 
 <br>
 
 ::: {layout-ncol=2}
-### Limite de 2 ACP séparées
-* L'ACP de $X$ maximise la variance interne de $X$ : $\max \operatorname{Var}(Xu)$.
-* L'ACP de $Y$ maximise la variance interne de $Y$ : $\max \operatorname{Var}(Yv)$.
-* **L'impasse :** Les deux analyses opèrent de façon totalement aveugle l'une par rapport à l'autre. Le premier axe de $X$ peut présenter une corrélation nulle avec le premier axe de $Y$ !
+### Approches asymétriques
+- **RDA, CCA** (modélisation sous contrainte)
+- Relation directionnelle : $Y = f(X)$
+- Expliquer la biologie strictement par le milieu
+- Risque de multicolinéarité et contrainte $n > p$
 
-### L'apport du couplage par Co-inertie
-* **Approche symétrique :** Statut strictement égalitaire entre biotope et biocénose (pas d'hypothèse unilatérale $Y = f(X)$ comme en régression/RDA).
-* **Recherche d'une co-structure commune :** Co-rotation simultanée des deux nuages pour faire coïncider leurs directions de variabilité partagée.
-* **Grande dimension ($p + q \gg n$) :** Aucune contrainte dimensionnelle.
+### Approches symétriques
+- **Co-inertie (CoIA), Procruste**
+- Statut égalitaire et symétrique des matrices
+- Recherche d'une **co-structure commune**
+- Aucune contrainte dimensionnelle ($p + q \gg n$ autorisé)
 :::
 
-<div class="summary-box">
-**Objectif :** Trouver un compromis optimal capable de décrire fidèlement la variabilité propre de chaque tableau tout en maximisant leur concordance mutuelle.
-</div>
+<br>
+
+* **Limite de deux ACP isolées :** Elles maximisent la variance interne propre à chaque nuage, sans garantir que leurs axes principaux se correspondent dans l'espace inter-tableaux.
 
 ::: {.notes}
-Cette diapositive pose la raison d'être de la co-inertie : faire deux ACP séparées ne garantit en rien que leurs axes concordent. La co-inertie oriente conjointement les deux espaces factoriels pour extraire leur signal écologique commun, sans imposer de relation asymétrique de régression.
+Distinguer approches asymétriques et symétriques : la RDA privilégie le milieu comme variable explicative. La co-inertie étudie la relation symétrique sans a priori de causalité stricte, ce qui est particulièrement adapté aux systèmes écologiques complexes.
 :::
 
 ## 5. Fondement théorique : Maximisation de la co-inertie
 
 <br>
 
-L'analyse de co-inertie (Dolédec & Chessel, 1994) recherche les axes unitaires $u \in \mathbb{R}^p$ ($u^T Q_X u = 1$) et $v \in \mathbb{R}^q$ ($v^T Q_Y v = 1$) maximisant la **covariance projetée au carré** :
+L'analyse de co-inertie (Dolédec & Chessel, 1994) recherche les axes unitaires $u \in \mathbb{R}^p$ et $v \in \mathbb{R}^q$ ($||u||=||v||=1$) maximisant la **covariance projetée au carré** :
 
-$$ \max_{u, v} \operatorname{Cov}_{D_n}^2(Xu, Yv) $$
+$$ \max_{u, v} Cov_{D_n}(Xu, Yv)^2 $$
 
 <br>
 
 ::: {.fragment}
-La décomposition fondamentale du compromis s'écrit :
-
-$$ \operatorname{Cov}^2(Xu, Yv) = \underbrace{\operatorname{Var}(Xu)}_{\text{Inertie explorée dans } X} \times \underbrace{\operatorname{Var}(Yv)}_{\text{Inertie explorée dans } Y} \times \underbrace{\operatorname{Corr}^2(Xu, Yv)}_{\text{Corrélation canonique au carré}} $$
+$$ Cov(Xu, Yv) = \underbrace{\sqrt{Var(Xu)}}_{\text{Inertie explorée dans } X} \times \underbrace{\sqrt{Var(Yv)}}_{\text{Inertie explorée dans } Y} \times \underbrace{Corr(Xu, Yv)}_{\text{Corrélation canonique}} $$
 
 <br>
 
 <div class="summary-box">
-* **Le compromis d'ordination :** 
-  - L'Analyse Canonique des Corrélations (ACC) maximise uniquement la corrélation $\operatorname{Corr}^2$, quitte à sélectionner des axes sans pertinence biologique (variance quasi nulle).
-  - La **Co-inertie** exige que l'axe soit à la fois **très corrélé** ET porteur d'une **forte inertie réelle** dans les deux tableaux.
+* **Le compromis d'ordination :** Contrairement à l'Analyse Canonique (qui maximise uniquement la corrélation quitte à retenir des axes de variance nulle), la co-inertie sélectionne des axes à **forte variance biologique et environnementale** ET **forte concordance mutuelle**.
 </div>
 :::
 
 ::: {.notes}
-La formule clé décompose la covariance en variance de X, variance de Y et corrélation canonique au carré. C'est le compromis tripartite qui immunise la co-inertie contre le surapprentissage des corrélations artificielles sans variance.
+C'est la formule clé : la covariance décomposée. La co-inertie ne sacrifie ni la variance écologique propre à chaque tableau, ni la corrélation croisée entre le biotope et la biocénose.
 :::
 
-## 6. Décomposition spectrale : Inertie et Corrélation par axe
+## 6. Protocole calculatoire sous R (`ade4`)
 
-Code R de diagonalisation et analyse conjointe de la co-inertie (`ade4`) :
+<br>
 
-::: {layout-ncol=2}
-<div>
 ```{r}
 #| echo: true
 library(ade4)
 data(doubs)
 
-# 1. Analyses préliminaires élémentaires
-dudi_env <- dudi.pca(doubs$env, scale = TRUE, scannf = FALSE, nf = 4)
-dudi_fau <- dudi.pca(doubs$fish, scale = FALSE, scannf = FALSE, nf = 4)
+# 1. Définition des schémas de dualité (triplets statistiques)
+dudi_env <- dudi.pca(doubs$env, scale = TRUE, scannf = FALSE, nf = 2)
+dudi_fau <- dudi.pca(doubs$fish, scale = FALSE, scannf = FALSE, nf = 2)
 
-# 2. Analyse de co-inertie
-co_doubs <- coinertia(dudi_env, dudi_fau, scannf = FALSE, nf = 4)
-
-# 3. Extraction de l'inertie et des corrélations canoniques
-eig_pct <- co_doubs$eig / sum(co_doubs$eig) * 100
-cor_k   <- sapply(1:4, function(k) cor(co_doubs$mX[,k], co_doubs$mY[,k]))
+# 2. Diagonalisation de l'opérateur de co-inertie
+co_doubs <- coinertia(dudi_env, dudi_fau, scannf = FALSE, nf = 2)
 ```
-
-* **Axe 1 :** `r round(eig_pct[1], 1)`% de co-inertie ($r = `r round(cor_k[1], 3)`$).
-* **Axe 2 :** `r round(eig_pct[2], 1)`% de co-inertie ($r = `r round(cor_k[2], 3)`$).
-* **Cumul Axe 1-2 :** **`r round(sum(eig_pct[1:2]), 1)`%** de la co-structure totale !
-* **Axes 3-4 :** Corrélations notables ($r > 0.55$) mais inerties négligeables (< 0.6%) $\rightarrow$ rejetés comme bruit résiduel.
-</div>
-
-<div>
-```{r}
-#| echo: true
-#| fig-width: 5.4
-#| fig-height: 4.1
-#| fig-align: center
-par(mfrow = c(1, 2), mar = c(3, 3, 2, 1), mgp = c(1.8, 0.6, 0))
-
-bp1 <- barplot(eig_pct[1:4], names.arg = paste("Axe", 1:4), col = "#0d7377",
-               ylim = c(0, 100), ylab = "Inertie projetée (%)", main = "Éboulis de co-inertie", las = 1)
-text(bp1, eig_pct[1:4] + 4, labels = paste0(round(eig_pct[1:4], 1), "%"), cex = 0.75, font = 2)
-
-bp2 <- barplot(cor_k, names.arg = paste("Axe", 1:4), col = "#f59e0b",
-               ylim = c(0, 1), ylab = "Corrélation canonique r", main = "Corrélation par axe", las = 1)
-text(bp2, cor_k + 0.05, labels = round(cor_k, 3), cex = 0.75, font = 2)
-```
-<p class="caption-custom">Figure 1 : Éboulis des valeurs propres (%) et corrélations canoniques inter-tableaux</p>
-</div>
-:::
-
-::: {.notes}
-Remarquons le graphique : les deux premiers axes concentrent 98.7% de la co-inertie totale avec d'excellentes corrélations (0.73 et 0.77). Les dimensions 3 et 4 ont beau avoir une corrélation correcte, leur variance est quasi-nulle, ce qui justifie de limiter l'analyse à 2 dimensions.
-:::
-
-## 7. Inférence scalaire & Validation préalable : Coefficient $RV$ & Monte-Carlo
-
-Avant toute interprétation graphique, la liaison inter-matrices est-elle statistiquement significative ?
-
-::: {layout-ncol=2}
-<div>
-**Le coefficient $RV$ d'Escoufier (1973) :**
-
-$$ RV(X, Y) = \frac{\operatorname{Tr}(W_X D_n W_Y D_n)}{\sqrt{\operatorname{Tr}((W_X D_n)^2) \times \operatorname{Tr}((W_Y D_n)^2)}} \in [0, 1] $$
-
-* **Sens géométrique :** Cosinus de l'angle entre les opérateurs d'inertie $W_X$ et $W_Y$ dans l'espace euclidien des matrices $\mathcal{M}_n$.
-* **Analogie :** Généralisation multivariée du coefficient de détermination $r^2$.
-* **Valeur observée pour le Doubs :** **$RV = `r round(co_doubs$RV, 3)`$**
-* En écologie de terrain, $RV \approx 0.45$ indique une **liaison structurale très intense**, compte tenu de la forte stochastique naturelle des peuplements.
-
-<div class="summary-box">
-**Conclusion du test :** Rejet indiscutable de $H_0$ ($p = 0.001$). La co-structure est réelle et hautement significative : **nous pouvons légitimement explorer les graphiques d'ordination.**
-</div>
-</div>
-
-<div>
-```{r}
-#| echo: true
-#| fig-width: 5.2
-#| fig-height: 3.9
-#| fig-align: center
-# Test de randomisation non paramétrique (999 permutations)
-set.seed(123)
-test_rv <- randtest(co_doubs, nrepet = 999)
-
-par(mar = c(3, 3, 2, 1), mgp = c(1.8, 0.6, 0))
-plot(test_rv, main = "Test de Monte-Carlo sous H0 vs Observé")
-```
-<p class="caption-custom">Figure 2 : Distribution du $RV$ simulé sous $H_0$ vs Valeur observée ($p = 0.001$)</p>
-</div>
-:::
-
-::: {.notes}
-Étape statistique primordiale : le coefficient RV mesure la liaison globale (0.451). Le test de Monte-Carlo permute 999 fois les lignes : le RV observé est rejeté tout à droite, avec une p-value de 0.001. L'association n'est pas fortuite : nous sommes autorisés à explorer les graphiques factoriels.
-:::
-
-## 8. Espace de compromis : Diagnostic des stations et résidus
-
-Projection des scores des stations : Milieu attendu ($f = Xu$) relié à la Faune observée ($g = Yv$) :
-
-::: {layout-ncol=2}
-<div>
-```{r}
-#| echo: true
-#| fig-width: 5.4
-#| fig-height: 4.2
-#| fig-align: center
-par(mar = c(3, 3, 1.5, 1), mgp = c(1.8, 0.6, 0))
-cols <- colorRampPalette(c("#1a6b7c", "#2a9d8f", "#e9c46a", "#e76f51", "#b2182b"))(30)
-xlim <- range(c(co_doubs$mX[,1], co_doubs$mY[,1])) * 1.15
-ylim <- range(c(co_doubs$mX[,2], co_doubs$mY[,2])) * 1.15
-
-plot(co_doubs$mX[,1], co_doubs$mX[,2], type = "n", xlim = xlim, ylim = ylim,
-     xlab = "Axe 1 (88.4 % - Gradient amont-aval)",
-     ylab = "Axe 2 (10.3 % - Eutrophisation / pollution)", las = 1)
-abline(h = 0, v = 0, lty = 2, col = "grey75"); grid(col = "grey90")
-
-# Flèches de couplage : origine = Milieu (X), pointe = Faune (Y)
-arrows(co_doubs$mX[,1], co_doubs$mX[,2], co_doubs$mY[,1], co_doubs$mY[,2], length = 0.07, col = cols, lwd = 1.9)
-points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, col = "#0e3b43", cex = 1.2)
-points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 1.0)
-text(co_doubs$mX[,1], co_doubs$mX[,2], labels = 1:30, pos = 3, cex = 0.65, font = 2)
-legend("bottomright", legend = c("Milieu attendu (X)", "Faune observée (Y)"),
-       pch = c(21, 17), pt.bg = c("grey90", "black"), col = "black", bty = "o", box.col = "grey75", bg = "white", cex = 0.72)
-```
-<p class="caption-custom">Figure 3 : Graphe des flèches stationnelles (équivalent `ade4::s.match(co_doubs$mX, co_doubs$mY)`)</p>
-</div>
-
-<div>
-<p style="font-weight: 700; font-size: 1.05em; color: #0b253a; margin-bottom: 0.4em;">Typologie diagnostique des flèches</p>
-
-* **● Rond** = Milieu abiotique attendu ($mX$).
-* **▲ Triangle** = Communauté piscicole observée ($mY$).
-* **Longueur de la flèche $||y_i - x_i||$ = Résidu écologique.**
 
 <br>
 
-* **Flèches courtes (St. 1 à 7, St. 11 à 20) :**
-  - **Adéquation forte :** Le peuplement piscicole est en parfait équilibre avec les conditions environnementales locales.
-
-* **Flèches longues = Découplage local majeur :**
-  - **Station 8 :** Flèche résiduelle extrême $\rightarrow$ Rupture karstique avec assèchement temporaire périodique (absence complète de poissons).
-  - **Stations 23, 24, 25 :** Écart biotope-biocénose spectaculaire $\rightarrow$ Déversements urbains et industriels massifs tirant le biotope vers le bas de l'axe 2.
-</div>
+::: {.callout-note icon=false}
+* **Taux d'inertie Axe 1 :** `r round(co_doubs$eig[1] / sum(co_doubs$eig) * 100, 1)`% &nbsp;|&nbsp; **Axe 2 :** `r round(co_doubs$eig[2] / sum(co_doubs$eig) * 100, 1)`%
+* **Restitution globale :** Le premier plan factoriel résume **`r round(sum(co_doubs$eig[1:2]) / sum(co_doubs$eig) * 100, 1)`%** de la co-structure totale.
+* **Conséquence :** Deux dimensions suffisent amplement à capturer l'essentiel de l'écologie du système.
 :::
 
 ::: {.notes}
-La longueur des flèches quantifie l'écart entre la théorie du biotope et la réalité faunistique. Deux découplages ressortent : la station 8 à cause de son assec karstique temporaire, et les stations 23 à 25 en aval des agglomérations industrielles où le milieu est pollué.
+Le calcul s'exécute en trois lignes simples. Remarquons que les deux premiers axes capturent 98.7% de l'inertie conjointe ! L'information écologique est donc presque intégralement visualisable sur un seul plan 2D.
 :::
 
-## 9. Projection des variables : Continuum fluvial & Impact de la pollution
-
-Projection conjointe des descripteurs abiotiques ($X$, coefficients $c1$) et des espèces piscicoles ($Y$, coefficients $l1$) :
+## 7. Espace de compromis : Diagnostic des résidus stationnels
 
 ::: {layout-ncol=2}
 <div>
 ```{r}
-#| echo: true
-#| fig-width: 5.4
-#| fig-height: 3.5
+#| echo: false
+#| fig-width: 5.1
+#| fig-height: 4.2
 #| fig-align: center
-par(mar = c(2.8, 2.8, 1.2, 0.8), mgp = c(1.6, 0.5, 0))
-lim_x <- max(abs(co_doubs$co[,1:2])) * 1.15
-plot(0, 0, type = "n", xlim = c(-lim_x, lim_x), ylim = c(-lim_x, lim_x),
-     xlab = "Axe 1 (88.4 % - Continuum amont-aval)", ylab = "Axe 2 (10.3 % - Pollution / altération)", las = 1, asp = 1)
-abline(h = 0, v = 0, lty = 2, col = "grey75"); grid(col = "grey90")
-arrows(0, 0, co_doubs$co[,1], co_doubs$co[,2], length = 0.06, col = "#0d7377", lwd = 1.8)
-text(co_doubs$co[,1], co_doubs$co[,2], labels = rownames(co_doubs$co), col = "#0b253a", cex = 0.78, font = 2, pos = ifelse(co_doubs$co[,1] > 0, 4, 2))
-title("Descripteurs physico-chimiques (X)", cex.main = 0.85, col.main = "#0d7377")
+par(mar = c(3.5, 3.5, 1, 1), mgp = c(2, 0.7, 0))
+
+# Gradient amont (vert sarcelle) -> aval (rouge chaud)
+cols <- colorRampPalette(c("#1a6b7c", "#2a9d8f", "#e9c46a", "#e76f51", "#b2182b"))(30)
+
+# Bornes adaptées aux deux nuages
+xlim <- range(c(co_doubs$mX[,1], co_doubs$mY[,1])) * 1.15
+ylim <- range(c(co_doubs$mX[,2], co_doubs$mY[,2])) * 1.15
+
+# Canevas principal
+plot(co_doubs$mX[,1], co_doubs$mX[,2], type = "n",
+     xlim = xlim, ylim = ylim,
+     xlab = "Axe de co-inertie 1 (gradient amont - aval)",
+     ylab = "Axe de co-inertie 2 (eutrophisation / pollution)",
+     las = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+
+# Vecteurs reliant le Milieu attendu à la Faune observée
+arrows(co_doubs$mX[,1], co_doubs$mX[,2], co_doubs$mY[,1], co_doubs$mY[,2],
+       length = 0.08, col = cols, lwd = 1.9)
+
+# Points : Milieu (rond cerclé) et Faune (triangle plein)
+points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, col = "#0e3b43", cex = 1.3)
+points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 1.1)
+
+# Numérotation des stations repères
+text(co_doubs$mX[,1], co_doubs$mX[,2], labels = 1:30, pos = 3, cex = 0.65, font = 2, col = "#0e3b43")
+
+# Légende
+legend("bottomright", 
+       legend = c("Milieu attendu (X)", "Faune observée (Y)"),
+       pch = c(21, 17), pt.bg = c("grey90", "black"), col = "black",
+       bty = "o", box.col = "grey75", bg = "white", cex = 0.8)
 ```
 
-* **Axe 1 (horizontal) = Morphodynamique :** 
-  - *Gauche :* Pente (`slo`), altitude (`alt`), eau vive.
-  - *Droite :* Distance source (`dfs`), débit (`flo`), dureté (`har`).
-* **Axe 2 (vertical) = Gradient de pollution moléculaire :**
-  - **Vers le bas : Pics massifs de molécules polluantes (St. 23-25)** :
-    - Ammonium (`amm`) : pic à **1.80 mg/L** à la St. 25.
-    - Phosphates (`pho`) : pic à **4.22 mg/L** à la St. 25.
-    - Nitrates (`nit`) : pic à **6.20 mg/L** à la St. 25.
-    - DBO₅ (`bdo`) : pic à **16.7 mg/L** (consommation d'oxygène).
-  - **Vers le haut :** Oxygène dissous saturé (`oxy` = 12.2 mg/L en amont, qui s'effondre à 4.1 mg/L en zone polluée !).
+<p class="caption-custom">Figure 1 : Espace de compromis des 30 stations du Doubs</p>
+</div>
+
+<div>
+<p style="font-weight: 700; font-size: 1.1em; color: #0b253a; margin-bottom: 0.5em;">Typologie de lecture vectorielle</p>
+
+* **Code couleur :** Du vert émeraude (amont, St. 1) au rouge brique (aval, St. 30).
+* **Symboles :** **● Rond** = biotope ($X$) &nbsp;|&nbsp; **▲ Triangle** = biocénose ($Y$).
+
+<br>
+
+* **Flèches courtes ($||y_i - x_i|| \approx 0$) :**
+  - **Équilibre écologique :** La faune présente correspond fidèlement à la typologie attendue du biotope.
+
+* **Flèches longues (ex: St. 8, St. 23–25) :**
+  - **Découplage local :** 
+    - **Station 8 :** Absence totale de poissons (débit karstique temporaire / assèchement périodique).
+    - **Stations 23-25 :** Rejets urbains et industriels majeurs provoquant un effondrement d'oxygène et un pic d'ammonium.
+</div>
+:::
+
+::: {.notes}
+La longueur des flèches mesure le résidu écologique : l'écart entre la prédiction environnementale et le peuplement réel. Les stations 23 à 25 révèlent la pollution historique en aval de Pontarlier et Besançon, où le filtre environnemental est perturbé par des rejets massifs d'ammonium.
+:::
+
+## 8. Projection des variables : Mécanismes du continuum
+
+<div style="font-size: 0.9em; margin-bottom: 0.6em; color: #475569;">
+Comment interpréter les axes de la diapositive précédente ? Les flèches de variables révèlent les <strong>forces motrices écologiques</strong> qui organisent les stations de gauche (amont) à droite (aval) :
+</div>
+
+::: {layout-ncol=2}
+<div>
+```{r}
+#| echo: false
+#| fig-width: 4.8
+#| fig-height: 3.7
+#| fig-align: center
+par(mar = c(3, 3, 1.2, 1), mgp = c(1.8, 0.6, 0))
+lim_x <- max(abs(co_doubs$co[,1:2])) * 1.2
+plot(0, 0, type = "n", xlim = c(-lim_x, lim_x), ylim = c(-lim_x, lim_x),
+     xlab = "Axe 1 (88.4 % - Gradient longitudinal)", 
+     ylab = "Axe 2 (10.3 % - Eutrophisation / perturbation)", 
+     las = 1, asp = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+arrows(0, 0, co_doubs$co[,1], co_doubs$co[,2], length = 0.07, col = "#0d7377", lwd = 1.8)
+text(co_doubs$co[,1], co_doubs$co[,2], labels = rownames(co_doubs$co),
+     col = "#0b253a", cex = 0.82, font = 2, pos = ifelse(co_doubs$co[,1] > 0, 4, 2))
+title("Descripteurs abiotiques (Milieu X)", line = 0.2, cex.main = 0.9, col.main = "#0d7377")
+```
+
+<p class="caption-custom">Figure 2a : Filtres environnementaux ($X$)</p>
+
+* **Pôle amont (gauche) :** Pente (`slo`), altitude (`alt`), oxygène (`oxy`).
+* **Pôle aval (droite) :** Distance source (`dfs`), débit (`flo`), nitrates (`nit`), phosphates (`pho`).
+* **Axe 2 (vertical) :** Ammonium (`amm`), DBO5 (`bdo`) $\rightarrow$ signature des stations polluées 23-25.
 </div>
 
 <div>
 ```{r}
-#| echo: true
-#| fig-width: 5.4
-#| fig-height: 3.5
+#| echo: false
+#| fig-width: 4.8
+#| fig-height: 3.7
 #| fig-align: center
-par(mar = c(2.8, 2.8, 1.2, 0.8), mgp = c(1.6, 0.5, 0))
-lim_y <- max(abs(co_doubs$li[,1:2])) * 1.15
+par(mar = c(3, 3, 1.2, 1), mgp = c(1.8, 0.6, 0))
+lim_y <- max(abs(co_doubs$li[,1:2])) * 1.2
 plot(0, 0, type = "n", xlim = c(-lim_y, lim_y), ylim = c(-lim_y, lim_y),
-     xlab = "Axe 1 (88.4 % - Continuum amont-aval)", ylab = "Axe 2 (10.3 % - Tolérance / dégradation)", las = 1, asp = 1)
-abline(h = 0, v = 0, lty = 2, col = "grey75"); grid(col = "grey90")
-arrows(0, 0, co_doubs$li[,1], co_doubs$li[,2], length = 0.06, col = "#f43f5e", lwd = 1.8)
-text(co_doubs$li[,1], co_doubs$li[,2], labels = rownames(co_doubs$li), col = "#991b1b", cex = 0.72, font = 2, pos = ifelse(co_doubs$li[,1] > 0, 4, 2))
-title("Espèces ichtyologiques (Y)", cex.main = 0.85, col.main = "#f43f5e")
+     xlab = "Axe 1 (88.4 % - Gradient longitudinal)", 
+     ylab = "Axe 2 (10.3 % - Tolérance pollution)", 
+     las = 1, asp = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+arrows(0, 0, co_doubs$li[,1], co_doubs$li[,2], length = 0.07, col = "#f43f5e", lwd = 1.8)
+text(co_doubs$li[,1], co_doubs$li[,2], labels = rownames(co_doubs$li),
+     col = "#991b1b", cex = 0.75, font = 2, pos = ifelse(co_doubs$li[,1] > 0, 4, 2))
+title("Espèces de poissons (Faune Y)", line = 0.2, cex.main = 0.9, col.main = "#f43f5e")
 ```
 
-* **Gauche (Axe 1 < 0) : Cortège rhéophile sténotherme d'eau vive froide :**
-  - Truite fario (`Satr`), Chabot (`Cogo`), Vairon (`Phph`), Loche franche (`Neba`).
-* **Droite (Axe 1 > 0) : Cyprinidés limnophiles d'eaux lentes de plaine :**
-  - Brème bordelière (`Abbr`), Gardon (`Ruru`), Tanche (`Titi`), Carpe (`Cyca`).
-* **Haut (Axe 2 > 0) :** Poissons d'eaux vives bien oxygénées (Ombre `Thth`, Blageon `Teso`, Barbeau `Baba`).
-* **Bas (Axe 2 < 0) : Secteur pollué (St. 23-25) :** Disparition des salmonidés ; seules persistent des espèces euryèces tolérantes (Ablette `Alal`, Gardon `Ruru`).
+<p class="caption-custom">Figure 2b : Réponses ichtyologiques ($Y$)</p>
+
+* **Gauche (St. 1 à 10) :** Cortège rhéophile d'eau vive froide $\rightarrow$ Truite (`Satr`), Chabot (`Cogo`), Vairon (`Phph`).
+* **Droite (St. 20 à 30) :** Cyprinidés limnophiles d'eaux lentes $\rightarrow$ Brème (`Abbr`), Gardon (`Ruru`), Tanche (`Titi`).
+* **Haut (Axe 2) :** Espèces tolérantes aux perturbations eutrophes $\rightarrow$ Chevaine (`Lece`), Goujon (`Gogo`).
 </div>
 :::
 
 ::: {.notes}
-Regardons attentivement la direction des flèches : l'Axe 1 est le gradient spatial d'amont en aval. L'Axe 2 sépare nettement les molécules polluantes vers le bas (ammonium, phosphates, nitrates, DBO5) de l'oxygène dissous vers le haut. Aux stations 23-25, la charge organique colossale effondre l'oxygène à 4.1 mg/L et élimine les espèces sensibles comme la truite.
+Ce slide fait le lien direct entre les stations de la diapo 7 et l'écologie : l'Axe 1 des stations (qui allait des stations 1 à 30) s'explique à gauche par l'altitude et l'oxygène avec la truite et le chabot, et à droite par le débit et les nutriments avec les cyprinidés. L'Axe 2 isole les rejets polluants (ammonium) qui décalaient les stations 23 à 25.
 :::
 
-## 10. Synthèse écologique : Zonation piscicole & Continuum fluvial
+## 9. Synthèse écologique : Zonation piscicole le long du continuum
 
-La co-structure mise en évidence valide expérimentalement la **zonation longitudinale de Marcel Huet (1949)** et le **River Continuum Concept (RCC, Vannote et al., 1980)** :
+La superposition des stations (Diapo 7) et des variables (Diapo 8) valide expérimentalement la **zonation longitudinale de Marcel Huet (1949)** :
 
 ```{r}
 #| echo: false
+# Tableau synthétique des zones écologiques de poissons
 zonation <- data.frame(
-  "Zone écologique (Huet)" = c("1. Zone à Truite (Rhithron)", "2. Zone à Ombre (Rhithron moyen)", "3. Zone à Barbeau (Épi-potamon)", "Rupture anthropique", "4. Zone à Brème (Potamon)"),
-  "Secteur du Doubs"        = c("Amont (St. 1 - 10)", "Boucle helvétique (St. 11 - 18)", "Moyen-cours (St. 19 - 22)", "Aval urbain (St. 23 - 25)", "Plaine de Saône (St. 26 - 30)"),
-  "Conditions abiotiques"    = c("Pente forte (>3‰), eau froide, O₂ saturé (12 mg/L)", "Courant vif, lit graveleux, eau fraîche", "Courant modéré, lit élargi, turbidité modérée", "Pics NH₄⁺ (1.8 mg/L), PO₄³⁻ (4.2 mg/L), hypoxie (4 mg/L)", "Pente faible (<1‰), eau chaude, lit limoneux lent"),
-  "Cortège piscicole"        = c("Truite (Satr), Chabot (Cogo), Vairon (Phph)", "Ombre (Thth), Hotu (Chna), Blageon (Teso)", "Barbeau (Baba), Chevesne (Lece), Spirlin (Spbi)", "Effondrement des salmonidés, survie de l'Ablette (Alal)", "Brème (Abbr), Gardon (Ruru), Tanche (Titi), Carpe (Cyca)"),
-  check.names = FALSE
+  "Zone_Ecologique" = c("1. Zone à Truite", "2. Zone à Ombre", "3. Zone à Barbeau", "4. Zone à Brème"),
+  "Position_Doubs" = c("Amont (St. 1 - 10)", "Haut-cours (St. 11 - 18)", "Moyen-cours (St. 19 - 22)", "Aval / Plaine (St. 26 - 30)"),
+  "Parametres_Cles" = c("Forte pente, eau froide, oxygène saturé", "Courant vif, fonds graveleux", "Courant modéré, lit élargi", "Pente faible, eau turbide, sédiments fins"),
+  "Cortège_Piscicole" = c("Truite (Satr), Chabot (Cogo), Vairon (Phph)", "Ombre (Thth), Hotu (Chna), Blageon (Teso)", "Barbeau (Baba), Chevesne (Lece), Spirlin (Spbi)", "Brème (Abbr), Gardon (Ruru), Tanche (Titi), Carpe (Cyca)")
 )
-kable(zonation, align = "c")
+colnames(zonation) <- c("Zone écologique", "Secteur du Doubs", "Conditions abiotiques", "Espèces indicatrices")
+kable(zonation)
 ```
 
 <div class="summary-box">
-**Interprétation bio-statistique conjointe :**
-* **Axe 1 (88.4 % de co-structure) = Le continuum naturel (Vannote et Huet) :** Gradient d'énergie et de pente structurant les niches écologiques de l'amont froid vers l'aval limnophile.
-* **Axe 2 (10.3 % de co-structure) = La signature des perturbations anthropiques :** Rupture locale et réversible du continuum par eutrophisation et pollution organique.
+**Conclusion du couplage :** 
+* **Axe 1 (88.4 % de co-structure) = Le River Continuum Concept (Vannote et al. 1980) :** Transition progressive et continue du filtre abiotique montagnard vers le biotope de plaine.
+* **Axe 2 (10.3 % de co-structure) = Les pressions anthropiques :** Rupture locale du continuum par eutrophisation et pollutions industrielles (stations 23–25).
 </div>
 
 ::: {.notes}
-La co-inertie fournit une preuve empirique splendide des théories fondamentales de l'écologie fluviale : la zonation de Huet et le River Continuum Concept de Vannote s'expriment sur l'axe 1, tandis que l'axe 2 isole spécifiquement l'impact anthropique localisé.
+On conclut la partie écologique en montrant que la co-inertie réunit à la fois le continuum théorique de Huet et Vannote sur l'axe 1, et le diagnostic d'impact anthropique sur l'axe 2.
 :::
 
-## 11. Comparatif méthodologique : AFM vs Co-inertie
+## 10. Inférence scalaire : Le coefficient $RV$
+
+<br>
+
+Mesure globale de concordance matricielle multivariée (Robert & Escoufier, 1976) :
+
+$$ RV = \frac{\operatorname{Tr}(X X^T Y Y^T)}{\sqrt{\operatorname{Tr}((X X^T)^2) \times \operatorname{Tr}((Y Y^T)^2)}} \in [0, 1] $$
+
+<br>
+
+* **Interprétation statistique :** Équivalent multivarié du coefficient de corrélation linéaire au carré ($r^2$).
+* **Propriété géométrique :** Mesure le cosinus de l'angle entre les deux configurations de points dans l'espace multidimensionnel.
+* **Valeur observée pour le Doubs :** **$RV = `r round(co_doubs$RV, 3)`$**
+
+<br>
+
+<div class="summary-box">
+Une valeur de $RV \approx 0.45$ indique une **liaison structurale très substantielle** entre la qualité abiotique de l'eau et la composition ichtyologique, considérant la variabilité intrinsèque des données écologiques de terrain.
+</div>
+
+::: {.notes}
+Le coefficient RV est le cosinus de l'angle entre les opérateurs de projection. Un RV de 0.45 sur des données biologiques de terrain reflète une cohésion forte et structurante.
+:::
+
+## 11. Test de permutation de Monte-Carlo
+
+<br>
+
+Test d'hypothèse non paramétrique ($H_0$ : indépendance totale entre les deux tableaux) :
+
+::: {layout-ncol=2}
+<div>
+<p style="font-weight: 700; font-size: 1.1em; color: #0b253a; margin-bottom: 0.5em;">Sortie numérique du test</p>
 
 ```{r}
 #| echo: true
-#| fig-width: 9.6
-#| fig-height: 3.5
+set.seed(123)
+test_rv <- randtest(co_doubs, nrepet = 999)
+cat("RV observé :", round(test_rv$obs, 3), "\n")
+cat("P-value    :", test_rv$pvalue, "\n")
+```
+
+<br>
+
+* **Rejet franc de $H_0$ ($p = 0.001$)** sur 999 permutations.
+* L'association observée entre milieu aquatique et faune piscicole est **hautement significative** ($p < 10^{-3}$).
+</div>
+
+<div>
+```{r}
+#| echo: false
+#| fig-width: 4.8
+#| fig-height: 3.8
+#| fig-align: center
+par(mar = c(3, 3, 2, 1))
+plot(test_rv, main = "Distribution sous H0 vs Valeur observée")
+```
+
+<p class="caption-custom">Figure 3 : Test de randomisation sous $H_0$</p>
+</div>
+:::
+
+::: {.notes}
+On permute 999 fois les lignes de la faune par rapport au milieu. Le RV observé se situe à l'extrême droite, démontrant statistiquement que l'appariement biotope-biocénose n'est pas le fruit du hasard.
+:::
+
+## 12. Comparatif visuel : AFM vs Co-inertie
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 4.0
 #| fig-align: center
 kt <- ktab.list.dudi(list(env = dudi_env, fish = dudi_fau))
 mfa_doubs <- mfa(kt, scannf = FALSE, nf = 2)
 
-par(mfrow = c(1, 2), mar = c(2.8, 2.8, 1.2, 0.8), mgp = c(1.6, 0.5, 0))
+par(mfrow = c(1, 2), mar = c(3.2, 3.2, 1.2, 1), mgp = c(1.8, 0.6, 0))
 cols <- colorRampPalette(c("#1a6b7c", "#2a9d8f", "#e9c46a", "#e76f51", "#b2182b"))(30)
 
-# 1. AFM : Représentation par consensus barycentrique
+# 1. Panneau AFM
 xlim_mfa <- range(c(mfa_doubs$lisup[,1], mfa_doubs$li[,1])) * 1.15
 ylim_mfa <- range(c(mfa_doubs$lisup[,2], mfa_doubs$li[,2])) * 1.15
-plot(0, 0, type = "n", xlim = xlim_mfa, ylim = ylim_mfa, xlab = "Dim 1", ylab = "Dim 2", las = 1, main = "AFM (Synthèse barycentrique)")
-abline(h = 0, v = 0, lty = 2, col = "grey75"); grid(col = "grey90")
-segments(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2], mfa_doubs$li[,1], mfa_doubs$li[,2], col = "grey65", lty = 3)
-segments(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2], mfa_doubs$li[,1], mfa_doubs$li[,2], col = "grey65", lty = 3)
-points(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2], pch = 21, bg = cols, col = "#0e3b43", cex = 1.0)
-points(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2], pch = 17, col = cols, cex = 0.9)
-points(mfa_doubs$li[,1], mfa_doubs$li[,2], pch = 3, col = "black", lwd = 1.4, cex = 0.8)
-legend("topleft", legend = c("Milieu", "Faune", "Barycentre (+)"), pch = c(21, 17, 3), pt.bg = c("grey90", "black", NA), bty = "o", box.col = "grey75", bg = "white", cex = 0.65)
 
-# 2. Co-inertie : Couplage vectoriel direct
+plot(0, 0, type = "n", xlim = xlim_mfa, ylim = ylim_mfa,
+     xlab = "Dimension 1", ylab = "Dimension 2", las = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+
+# Trajectoires vers le barycentre
+segments(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2],
+         mfa_doubs$li[,1], mfa_doubs$li[,2], col = "grey65", lty = 3)
+segments(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2],
+         mfa_doubs$li[,1], mfa_doubs$li[,2], col = "grey65", lty = 3)
+
+points(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2], pch = 21, bg = cols, col = "#0e3b43", cex = 1.1)
+points(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2], pch = 17, col = cols, cex = 1.0)
+points(mfa_doubs$li[,1], mfa_doubs$li[,2], pch = 3, col = "black", lwd = 1.5, cex = 0.9)
+
+legend("topleft", legend = c("Milieu (partiel)", "Faune (partiel)", "Barycentre (+)"),
+       pch = c(21, 17, 3), pt.bg = c("grey90", "black", NA), col = "black",
+       bty = "o", box.col = "grey75", bg = "white", cex = 0.7)
+
+# 2. Panneau Co-inertie
 xlim_co <- range(c(co_doubs$mX[,1], co_doubs$mY[,1])) * 1.15
 ylim_co <- range(c(co_doubs$mX[,2], co_doubs$mY[,2])) * 1.15
-plot(0, 0, type = "n", xlim = xlim_co, ylim = ylim_co, xlab = "Axe 1", ylab = "Axe 2", las = 1, main = "Co-inertie (Couplage vectoriel direct)")
-abline(h = 0, v = 0, lty = 2, col = "grey75"); grid(col = "grey90")
-arrows(co_doubs$mX[,1], co_doubs$mX[,2], co_doubs$mY[,1], co_doubs$mY[,2], length = 0.06, col = cols, lwd = 1.7)
-points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, col = "#0e3b43", cex = 1.0)
-points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 0.9)
-legend("bottomright", legend = c("Milieu attendu", "Faune observée"), pch = c(21, 17), pt.bg = c("grey90", "black"), bty = "o", box.col = "grey75", bg = "white", cex = 0.65)
+
+plot(0, 0, type = "n", xlim = xlim_co, ylim = ylim_co,
+     xlab = "Axe de co-inertie 1", ylab = "Axe de co-inertie 2", las = 1)
+abline(h = 0, v = 0, lty = 2, col = "grey75")
+grid(col = "grey90")
+
+arrows(co_doubs$mX[,1], co_doubs$mX[,2], co_doubs$mY[,1], co_doubs$mY[,2],
+       length = 0.07, col = cols, lwd = 1.8)
+points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, col = "#0e3b43", cex = 1.1)
+points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 1.0)
+
+legend("bottomright", legend = c("Milieu attendu", "Faune observée"),
+       pch = c(21, 17), pt.bg = c("grey90", "black"), col = "black",
+       bty = "o", box.col = "grey75", bg = "white", cex = 0.7)
 ```
 
 ::: {layout-ncol=2}
-* **Analyse Factorielle Multiple (AFM) :**
-  - Recherche une **configuration moyenne de consensus** (barycentre $+$).
-  - Tendance à gommer ou moyenner les écarts individuels.
-
-* **Analyse de Co-inertie (CoIA) :**
-  - Maximise la **covariance directe** entre les deux matrices.
-  - **Puissance diagnostique supérieure :** Trace explicitement le vecteur d'écart $X \rightarrow Y$ pour chaque station.
-:::
-
-::: {.notes}
-L'AFM cherche un consensus moyen où chaque station est attirée vers un barycentre. La co-inertie est plus diagnostique car elle trace la flèche directe du milieu vers la faune, révélant la trajectoire précise du décalage écologique.
-:::
-
-## 12. Analyse critique : Atouts & Limites de la Co-inertie
-
-Bilan méthodologique exhaustif des forces et des précautions d'usage :
-
-::: {layout-ncol=2}
-### Pour (Atouts majeurs)
-* **Pas de contrainte dimensionnelle ($p + q \gg n$) :** 
-  - Fonctionne même si le nombre de variables dépasse le nombre d'individus (métagénomique, traits fonctionnels).
-* **Insensibilité à la colinéarité :** 
-  - Aucune inversion de matrice $(X^T X)^{-1}$ requise (contrairement à l'ACC et la RDA). Décomposition spectrale (SVD) toujours stable.
-* **Compromis d'ordination optimal :**
-  - Évite les axes hyper-corrélés mais vides de variance de l'ACC.
-* **Universalité des triplets statistiques :**
-  - Permet de coupler n'importe quelles analyses élémentaires (ACP-ACP, ACP-AFC, ACM-ACP) sous réserve de partager le même poids de lignes $D_n$.
-* **Diagnostic vectoriel direct :**
-  - Identification immédiate des anomalies stationnelles (flèches résiduelles).
-
-### Contre (Limites & Précautions)
-* **Caractère purement descriptif / exploratoire :**
-  - Ne fournit pas d'équation de prédiction causale unilatérale ($Y = f(X)$).
-* **Sensibilité aux valeurs extrêmes (*outliers*) :**
-  - Maximise des sommes de carrés d'inertie : une station aberrante peut peser lourdement sur l'orientation des axes.
-* **Sensibilité du coefficient $RV$ à la dimension :**
-  - Le $RV$ augmente mécaniquement avec le nombre de colonnes pour un faible effectif $n$, rendant le test de permutation sous $H_0$ **absolument obligatoire**.
-* **Absence de sélection automatique de variables :**
-  - Toutes les variables restent présentes (pas de parcimonie directe type Lasso).
-:::
-
-::: {.notes}
-Voici le tableau de synthèse des forces et faiblesses : la co-inertie est idéale pour les jeux de données complexes et de grande dimension sans risque de colinéarité, mais reste une méthode exploratoire descriptive nécessitant obligatoirement un test de permutation.
-:::
-
-## 13. Synthèse générale & Perspectives
-
-<br>
-
-::: {layout-ncol=2}
 <div>
-<div class="summary-box">
-<span class="badge-eco">Synthèse théorique & méthodologique</span>
+<p class="caption-custom">Figure 4a : AFM (synthèse par barycentre)</p>
 
-* **Compromis tripartite mathématique optimal :** 
-  $\lambda = \operatorname{Var}(X) \times \operatorname{Var}(Y) \times \operatorname{Corr}^2$.
-* **Inférence robuste :** Le coefficient $RV = 0.451$ couplé au test de Monte-Carlo ($p = 0.001$) prouve une co-structure majeure.
-* **Supériorité opérationnelle :** Alternative plus stable et informative que l'ACC ou la RDA en contexte écologique non expérimental.
-</div>
+* **Philosophie :** Recherche d'une représentation moyenne de consensus.
+* **Effet barycentrique :** Les discordances individuelles sont atténuées vers le centre moyen.
 </div>
 
 <div>
-<div class="summary-box">
-<span class="badge-fish">Synthèse écologique & Perspectives</span>
+<p class="caption-custom">Figure 4b : Co-inertie (couplage vectoriel direct)</p>
 
-* **Validation du continuum fluvial :** L'Axe 1 (88.4%) confirme la zonation de Huet (1949) et le River Continuum Concept (Vannote, 1980).
-* **Diagnostic des dégradations locales :** L'Axe 2 (10.3%) identifie la pollution critique par ammonium et matières organiques (St. 23-25).
-* **Transposabilité :** Méthodologie directement applicable aux relations sol-microbiote (succession écologique, dilution, métagénomique).
-</div>
+* **Philosophie :** Maximisation de la covariance croisée directe ($X \leftrightarrow Y$).
+* **Caractère diagnostique :** Matérialise directement la force et le sens du décalage écologique station par station.
 </div>
 :::
 
-<br>
+::: {.notes}
+Différence clé : l'AFM fait une moyenne (barycentre). La co-inertie trace la flèche directe du milieu vers le vivant. Elle montre précisément comment et vers où le peuplement s'éloigne de son biotope sous l'effet de perturbations.
+:::
 
-<div style="text-align: center; color: #64748b; font-size: 0.9em; font-weight: 600;">
-Merci pour votre attention. Questions & Échanges.
-</div>
+## 13. Propriétés métriques & Précautions
+
+::: {layout-ncol=2}
+### Atouts méthodologiques majeurs
+- **Condition de grande dimension ($p + q \gg n$) :** Fonctionne sans saturation (métagénomique, traits fonctionnels).
+- **Insensibilité à la multicolinéarité :** Pas d'inversion de matrice de covariance nécessaire.
+- **Universalité des triplets :** Permet de coupler ACP, AFC, ACM ou PCoA au sein d'un même formalisme.
+
+### Précautions d'usage
+- **Nature descriptive :** Pas de modèle directionnel causal formel ($Y \neq f(X)$).
+- **Sensibilité aux points aberrants :** Les stations à forte inertie (*outliers*) peuvent peser fortement sur l'orientation des axes.
+:::
 
 ::: {.notes}
-En conclusion, la co-inertie allie rigueur mathématique et pertinence diagnostique pour l'écologue aquatique ou terrestre. Elle ouvre la voie à l'analyse des grands jeux de données modernes comme la métagénomique des sols.
+La co-inertie est idéale lorsque le nombre de variables dépasse largement le nombre d'individus, ce qui la rend incontournable en écologie moderne (génomique environnementale, diversité microbienne des sols).
+:::
+
+## 14. Synthèse générale & Perspectives
+
+<br>
+
+* **Compromis théorique optimal :** Maximise simultanément l'inertie propre à chaque tableau et leur corrélation canonique.
+
+<br>
+
+* **Puissance diagnostique en écologie :**
+  - Confirme la structuration continue amont $\rightarrow$ aval (zonation de Huet & RCC).
+  - Détecte immédiatement les ruptures anthropiques (stations 23 à 25 polluées).
+
+<br>
+
+* **Validation statistique rigoureuse :** Test de permutation non paramétrique sur le coefficient $RV$.
+
+<br>
+
+* **Transposabilité :** Méthodologie directement applicable aux relations biotope-biocénose dans d'autres écosystèmes (ex. microbiote des sols, succession écologique).
+
+::: {.notes}
+En conclusion, la co-inertie allie rigueur mathématique et pertinence diagnostique pour l'écologue aquatique ou terrestre.
 :::
