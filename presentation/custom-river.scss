@@ -167,6 +167,13 @@ $presentation-font-size-root: 24.5px;
   font-family: 'JetBrains Mono', monospace;
 }
 
+// Code long en annexe : on réduit pour que le script tienne sur une slide
+.reveal .annex-code pre code {
+  font-size: 0.56em;
+  line-height: 1.20;
+  padding: 0.45em 0.7em;
+}
+
 // Boîte de synthèse moderne (Card)
 .summary-box {
   background: #ffffff;
