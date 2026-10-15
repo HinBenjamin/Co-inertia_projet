@@ -756,7 +756,7 @@ II
 :::
 ::: {.sommaire-content}
 ::: {.sommaire-item-title}
-CHESSEL, D., DUFOUR, A.-B, "Co-inertie, co-structures et compromis", p.2-10
+CHESSEL, Daniel, DUFOUR, A.-B, "Co-inertie, co-structures et compromis", p.2-10
 :::
 ::: {.sommaire-item-desc}
 https://esb.univ-lyon1.fr/pdf/cssb8.pdf
@@ -770,7 +770,7 @@ III
 :::
 ::: {.sommaire-content}
 ::: {.sommaire-item-title}
-CHESSEL, D., "Ichtyofaune du bassin du Doubs"
+CHESSEL, Daniel, "Ichtyofaune du bassin du Doubs"
 :::
 ::: {.sommaire-item-desc}
 https://esb.univ-lyon1.fr/pdf/pps047.pdf
@@ -791,7 +791,10 @@ https://pmc.ncbi.nlm.nih.gov/articles/PMC317282/
 :::
 :::
 :::
+:::
 
+## Bibliographie (suite)
+::: {.sommaire-list}
 ::: {.sommaire-item}
 ::: {.sommaire-badge}
 V
@@ -802,6 +805,35 @@ DUFOUR, A.B, "Coinertia Analysis"
 :::
 ::: {.sommaire-item-desc}
 https://esb.univ-lyon1.fr/pdf/course6.pdf
+:::
+:::
+:::
+
+::: {.sommaire-item}
+::: {.sommaire-badge}
+VI
+:::
+::: {.sommaire-content}
+::: {.sommaire-item-title}
+DRAY, Stéphane, CHESSEL, Daniel, THIOULOUSE, Jean, "CO-INERTIA ANALYSIS AND THE LINKING OF
+ECOLOGICAL DATA TABLES"
+:::
+::: {.sommaire-item-desc}
+https://hal.science/hal-00427392v1
+:::
+:::
+:::
+
+::: {.sommaire-item}
+::: {.sommaire-badge}
+VII
+:::
+::: {.sommaire-content}
+::: {.sommaire-item-title}
+CHESSEL, Daniel, DUFOUR, A.-B., "Pratique de l’analyse des correspondances"
+:::
+::: {.sommaire-item-desc}
+https://esb.univ-lyon1.fr/pdf/tdr62.pdf
 :::
 :::
 :::
