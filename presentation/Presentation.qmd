@@ -732,6 +732,83 @@ Ce bilan résume les forces et limites de la méthode : c'est un outil explorato
 En synthèse, la co-inertie est la méthode multitableaux de référence pour relier deux matrices mesurées sur les mêmes individus. Elle combine robustesse en grande dimension, respect de la variance propre à chaque tableau et puissance de diagnostic visuel, tout en restant une méthode exploratoire symétrique.
 :::
 
+
+
+## Bibliographie
+::: {.sommaire-list}
+::: {.sommaire-item}
+::: {.sommaire-badge}
+I
+:::
+::: {.sommaire-content}
+::: {.sommaire-item-title}
+HERVÉ, Maxime, "Aide-mémoire de statistique appliquée à la biologie", p.193-195
+:::
+::: {.sommaire-item-desc}
+https://archive.linux.duke.edu/pub/cran/doc/contrib/Herve-Aide-memoire-statistique.pdf?
+:::
+:::
+:::
+
+::: {.sommaire-item}
+::: {.sommaire-badge}
+II
+:::
+::: {.sommaire-content}
+::: {.sommaire-item-title}
+CHESSEL, D., DUFOUR, A.-B, "Co-inertie, co-structures et compromis", p.2-10
+:::
+::: {.sommaire-item-desc}
+https://esb.univ-lyon1.fr/pdf/cssb8.pdf
+:::
+:::
+:::
+
+::: {.sommaire-item}
+::: {.sommaire-badge}
+III
+:::
+::: {.sommaire-content}
+::: {.sommaire-item-title}
+CHESSEL, D., "Ichtyofaune du bassin du Doubs"
+:::
+::: {.sommaire-item-desc}
+https://esb.univ-lyon1.fr/pdf/pps047.pdf
+:::
+:::
+:::
+
+::: {.sommaire-item}
+::: {.sommaire-badge}
+IV
+:::
+::: {.sommaire-content}
+::: {.sommaire-item-title}
+C CULHANE, Aedin, PERRIERE, Guy, G HIGGINS, Desmond, "Cross-platform comparison and visualisation of gene expression data using co-inertia analysis"
+:::
+::: {.sommaire-item-desc}
+https://pmc.ncbi.nlm.nih.gov/articles/PMC317282/
+:::
+:::
+:::
+
+::: {.sommaire-item}
+::: {.sommaire-badge}
+V
+:::
+::: {.sommaire-content}
+::: {.sommaire-item-title}
+DUFOUR, A.B, "Coinertia Analysis"
+:::
+::: {.sommaire-item-desc}
+https://esb.univ-lyon1.fr/pdf/course6.pdf
+:::
+:::
+:::
+:::
+
+
+
 ## Annexe A. Synthèse écologique : Zonation de Huet & Continuum fluvial
 
 L'ordination factorielle de co-inertie valide les modèles théoriques de l'écologie des eaux courantes :
