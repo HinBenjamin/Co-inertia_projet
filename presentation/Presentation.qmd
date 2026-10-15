@@ -39,7 +39,7 @@ I
 Cadre d'analyse & Matrices appariées
 :::
 ::: {.sommaire-item-desc}
-Dispositif d'échantillonnage du Doubs, formalisation des triplets statistiques $(X, Q_X, D)$ et $(Y, Q_Y, D)$.
+Dispositif d'échantillonnage du Doubs, préparation et ordination des données du milieu et de la faune.
 :::
 :::
 :::
@@ -92,6 +92,8 @@ Voici le plan de notre cours structuré en 4 parties académiques : le cadre mé
 :::
 
 ## 1. Contexte & Localisation : La rivière du Doubs
+
+<span class="section-tracker">Partie I : Cadre d'analyse & Matrices appariées</span>
 
 :::: {.columns}
 
@@ -189,9 +191,9 @@ kable(env_sub, digits = 2)
 
 ::: {.column width="50%"}
 <div class="cours-box box-prop" style="margin-top: 0.15em;">
-<div class="cours-box-header">Triplet statistique $(X, Q_X, D)$</div>
+<div class="cours-box-header">Analyse préalable du Milieu</div>
 * **Ordination préliminaire :** **ACP normée** (`dudi.pca(..., scale = TRUE)`).
-* **Règle méthodologique :** Standardisation centrée-réduite $Q_X = \operatorname{diag}(1/s_j^2)$ obligatoire pour annuler les disparités d'unités physiques.
+* **Principe méthodologique :** Centrage et réduction indispensables pour harmoniser les différentes unités physiques ($m$, $mg/L$, $m^3/s$) et donner un poids équivalent à chaque descripteur.
 </div>
 :::
 
@@ -228,9 +230,9 @@ kable(fish_sub)
 
 ::: {.column width="50%"}
 <div class="cours-box box-prop" style="margin-top: 0.15em;">
-<div class="cours-box-header">Triplet statistique $(Y, Q_Y, D)$</div>
+<div class="cours-box-header">Analyse préalable de la Faune</div>
 * **Ordination préliminaire :** **ACP simplement centrée non normée** (`scale = FALSE`).
-* **Règle méthodologique :** Métrique identité ($Q_Y = I_q$). Ne pas réduire permet de conserver la variance écologique réelle et la hiérarchie des abondances.
+* **Principe méthodologique :** Centrage sans réduction pour conserver la variance écologique réelle et respecter la hiérarchie naturelle des abondances d'espèces.
 </div>
 :::
 
@@ -240,40 +242,28 @@ kable(fish_sub)
 Le tableau Y contient 27 espèces mesurées sur les 30 mêmes stations. L'ACP est simplement centrée, sans réduire la variance, afin de conserver la hiérarchie naturelle des abondances d'espèces.
 :::
 
-## 4. Fondement théorique : Maximisation de la co-inertie
+## 4. Principe & Définition de la Co-inertie (CIA)
+
+<span class="section-tracker">Partie II : Fondements théoriques de la Co-inertie</span>
 
 <div class="cours-box box-theo" style="margin: 0.35em 0; padding: 0.75em 1.1em;">
-<div class="cours-box-header">Théorème fondamental (Dolédec & Chessel, 1994)</div>
-Soient deux triplets statistiques $(X, Q_X, D)$ et $(Y, Q_Y, D)$. L'analyse de co-inertie détermine le couple d'axes factoriels $(u, v)$ normés ($u^T Q_X u = v^T Q_Y v = 1$) maximisant la covariance projetée :
-<p style="text-align: center; margin: 0.35em 0; font-size: 1.18em; font-weight: 700; color: #0b253a;">
-$$ \operatorname{Cov}^2(Xu, Yv) = \underbrace{\operatorname{Var}(Xu)}_{\text{Inertie propre } X} \times \underbrace{\operatorname{Var}(Yv)}_{\text{Inertie propre } Y} \times \underbrace{\operatorname{Corr}^2(Xu, Yv)}_{\text{Corrélation canonique}} $$
+<div class="cours-box-header">Définition de la Co-inertie (Dolédec & Chessel, 1994)</div>
+L'analyse de co-inertie (CIA) relie deux tableaux de données mesurés sur les mêmes individus (ici les stations). Elle recherche des axes synthétiques communs qui maximisent la **covariance au carré** entre les deux jeux de données :
+<p style="text-align: center; margin: 0.45em 0; font-size: 1.18em; font-weight: 700; color: #0b253a;">
+$$ \operatorname{Cov}^2(Xu, Yv) = \underbrace{\operatorname{Var}(Xu)}_{\text{Inertie propre } X} \times \underbrace{\operatorname{Var}(Yv)}_{\text{Inertie propre } Y} \times \underbrace{\operatorname{Corr}^2(Xu, Yv)}_{\text{Corrélation au carré}} $$
 </p>
 </div>
 
-:::: {.columns}
+<div class="cours-box box-def" style="margin-top: 0.5em; padding: 0.85em 1.2em; font-size: 0.95em; line-height: 1.55;">
+<div class="cours-box-header">En résumé : les points clés</div>
 
-::: {.column width="50%"}
-<div class="cons-box" style="font-size: 0.84em; line-height: 1.42;">
-<p style="font-weight: 700; color: #e11d48; margin-bottom: 0.3em;">Limites de l'Analyse Canonique des Corrélations (ACC)</p>
-
-* Maximise **uniquement la corrélation** $\operatorname{Corr}^2(Xu, Yv)$.
-* Risque d'isoler des axes de variance quasi nulle, instables et hypersensibles au bruit numérique en grande dimension ($p + q > n$).
+* **Un compromis tripartite équilibré :** Pour identifier une liaison forte, la méthode exige à la fois une forte variabilité dans le milieu ($X$), une forte variabilité dans la faune ($Y$) et une corrélation élevée entre les deux.
+* **Une approche symétrique :** Aucun tableau n'est privilégié ou posé comme variable réponse ($Y = f(X)$) ; les deux jeux de données sont traités sur un pied d'égalité.
+* **Stabilité et robustesse :** En combinant variance et corrélation, la co-inertie reste stable et évite d'isoler des axes artificiels, même lorsqu'il y a plus de variables que de stations ($p + q > n$).
 </div>
-:::
-
-::: {.column width="50%"}
-<div class="pros-box" style="font-size: 0.84em; line-height: 1.42;">
-<p style="font-weight: 700; color: #16a34a; margin-bottom: 0.3em;">Avantages de l'Analyse de Co-inertie (CIA)</p>
-
-* Maximise le **compromis variance $\times$ corrélation**.
-* Sélectionne des axes factoriels stables capturant une **forte inertie propre** et une **forte concordance écologique mutuelle**.
-</div>
-:::
-
-::::
 
 ::: {.notes}
-La formule clé : la covariance au carré se décompose en produit des variances et de la corrélation au carré. C'est ce compromis à 3 termes qui confère à la co-inertie sa stabilité mathématique remarquable. Rappeler à l'oral que la co-inertie est une méthode symétrique (sans poser Y = f(X) comme en RDA), qui fonctionne même si p + q > n.
+La formule clé : la covariance au carré se décompose en produit des variances et de la corrélation au carré. Ce compromis confère à la co-inertie sa stabilité : elle isole les structures écologiques communes majeures sans privilégier un tableau par rapport à l'autre.
 :::
 
 ## 5. Décomposition de l'inertie & Corrélations canoniques
@@ -358,20 +348,23 @@ Cette figure justifie rigoureusement le choix de 2 dimensions : les deux premier
 
 ::: {.column width="48%"}
 <div class="cours-box box-def">
-<div class="cours-box-header">Coefficient $RV$ (Escoufier, 1973)</div>
+<div class="cours-box-header">Définition du Coefficient $RV$ (Escoufier, 1973)</div>
 
-<p style="text-align: center; font-size: 1.08em; font-weight: 700; margin: 0.25em 0;">
-$$ RV = \frac{\operatorname{Tr}(X Q_X X^T D Y Q_Y Y^T D)}{\sqrt{\operatorname{Tr}((X Q_X X^T D)^2) \times \operatorname{Tr}((Y Q_Y Y^T D)^2)}} \in [0, 1] $$
+Le coefficient $RV$ mesure le **degré de liaison globale** entre les deux tableaux de données mesurés sur les mêmes stations.
+<p style="text-align: center; font-size: 1.10em; font-weight: 700; margin: 0.35em 0; color: #0b253a;">
+$$ RV \in [0, 1] \quad (\text{analogue d'un } R^2 \text{ multivarié}) $$
 </p>
 
-* **Sens mathématique :** Cosinus de l'angle entre configurations d'opérateurs ($R^2$ multivarié).
-* **Valeur observée (Doubs) :** <span class="badge-eco" style="font-size: 0.92em; font-weight: 800; padding: 0.2em 0.6em;">RV = 0.451</span>
-* **Interprétation :** Intensité de couplage très élevée pour un écosystème naturel ouvert.
+* **$RV = 0$ :** Indépendance totale entre les deux tableaux.
+* **$RV = 1$ :** Concordance parfaite entre les deux structures.
 </div>
 
 <div class="cours-box box-rem" style="margin-top: 0.35em;">
-<div class="cours-box-header">Règle de validation méthodologique</div>
-Ne jamais commenter un plan factoriel sans test préalable. L'absence de distribution asymptotique sous $H_0$ impose une procédure de ré-échantillonnage par permutation.
+<div class="cours-box-header">En résumé : interprétation & test</div>
+
+* **Valeur observée (Doubs) :** <span class="badge-eco" style="font-size: 0.90em; font-weight: 800; padding: 0.15em 0.5em;">RV = 0.451</span>
+* **Interprétation :** Forte concordance globale entre les descripteurs du milieu et la communauté de poissons.
+* **Validation obligatoire :** On ne peut pas interpréter un plan factoriel sans tester si ce résultat dépasse le simple hasard (test de Monte-Carlo).
 </div>
 :::
 
@@ -389,8 +382,8 @@ plot(test_rv, main = "Distribution sous H0 vs Observé")
 
 <div class="cours-box box-app" style="margin-top: 0.2em;">
 <div class="cours-box-header">Résultat du test de Monte-Carlo</div>
-* **Permutations :** 999 permutations aléatoires des lignes (stations).
-* **Significativité :** **$p = 0.001$**. Rejet de l'hypothèse nulle d'indépendance. La structure conjointe biotope-biocénose est avérée.
+* **Permutations :** 999 permutations aléatoires des stations.
+* **Significativité :** **$p = 0.001$**. Le lien observé est nettement supérieur à ce que donnerait le hasard : la co-structure biotope-biocénose est statistiquement validée.
 </div>
 :::
 
@@ -402,13 +395,15 @@ Règle d'or en biométrie : on ne commente pas un plan factoriel sans test préa
 
 ## 7. Projection des variables & Corrélations CIA (`RVAideMemoire`)
 
+<span class="section-tracker">Partie III : Inférence statistique & Espaces factoriels</span>
+
 :::: {.columns}
 
-::: {.column width="62%"}
+::: {.column width="60%"}
 ```{r}
 #| echo: false
-#| fig-width: 6.8
-#| fig-height: 4.2
+#| fig-width: 6.6
+#| fig-height: 4.1
 #| fig-align: center
 library(RVAideMemoire)
 
@@ -420,74 +415,80 @@ par(mfrow = c(1, 2), mar = c(2.6, 2.6, 1.8, 0.8), mgp = c(1.5, 0.4, 0))
 # PANEL 1 : MILIEU (X)
 plot(0, 0, type = "n", xlim = c(-1.45, 1.55), ylim = c(-1.3, 1.3), asp = 1,
      xlab = "Axe 1 (88.4 %)", ylab = "Axe 2 (10.3 %)",
-     main = "Milieu (X) - 11 descripteurs", cex.main = 0.90, col.main = "#0b253a", las = 1)
+     main = "Milieu (X) - 11 descripteurs", cex.main = 0.92, col.main = "#0b253a", las = 1)
 t <- seq(0, 2*pi, length.out = 200)
-lines(cos(t), sin(t), col = "#334155", lwd = 1.3)
-lines(0.5*cos(t), 0.5*sin(t), col = "grey70", lty = 3)
-abline(h = 0, v = 0, lty = 2, col = "grey80")
-arrows(0, 0, cor_x[,1] * 0.90, cor_x[,2] * 0.90, length = 0.07, col = "#0d7377", lwd = 1.8)
-text(cor_x["dfs",1] + 0.02, cor_x["dfs",2] - 0.03, labels = "dfs", cex = 0.72, font = 2, col = "#0d7377", pos = 4)
-text(cor_x["flo",1] + 0.02, cor_x["flo",2] + 0.05, labels = "flo", cex = 0.72, font = 2, col = "#0d7377", pos = 4)
-text(cor_x["alt",1] - 0.03, cor_x["alt",2] + 0.05, labels = "alt", cex = 0.72, font = 2, col = "#0d7377", pos = 2)
-text(cor_x["slo",1] - 0.03, cor_x["slo",2] - 0.05, labels = "slo", cex = 0.72, font = 2, col = "#0d7377", pos = 2)
-text(cor_x["oxy",1] - 0.03, cor_x["oxy",2] + 0.05, labels = "oxy", cex = 0.72, font = 2, col = "#0d7377", pos = 3)
-text(cor_x["pH", 1] + 0.03, cor_x["pH", 2] + 0.05, labels = "pH", cex = 0.72, font = 2, col = "#0d7377", pos = 3)
-text(cor_x["nit",1] + 0.03, cor_x["nit",2] + 0.02, labels = "nit", cex = 0.70, font = 2, col = "#b45309", pos = 4)
-text(0.38, -1.02, labels = "amm", cex = 0.70, font = 2, col = "#dc2626", pos = 2)
-text(0.58, -1.08, labels = "bdo", cex = 0.70, font = 2, col = "#dc2626", pos = 1)
-text(0.72, -0.92, labels = "pho", cex = 0.70, font = 2, col = "#dc2626", pos = 4)
+lines(cos(t), sin(t), col = "#0f172a", lwd = 1.8)
+lines(0.5*cos(t), 0.5*sin(t), col = "#94a3b8", lty = 3)
+abline(h = 0, v = 0, lty = 2, col = "#cbd5e1")
+arrows(0, 0, cor_x[,1] * 0.90, cor_x[,2] * 0.90, length = 0.08, col = "#0d7377", lwd = 2.2)
+text(cor_x["dfs",1] + 0.02, cor_x["dfs",2] - 0.03, labels = "dfs", cex = 0.74, font = 2, col = "#0d7377", pos = 4)
+text(cor_x["flo",1] + 0.02, cor_x["flo",2] + 0.05, labels = "flo", cex = 0.74, font = 2, col = "#0d7377", pos = 4)
+text(cor_x["alt",1] - 0.03, cor_x["alt",2] + 0.05, labels = "alt", cex = 0.74, font = 2, col = "#0d7377", pos = 2)
+text(cor_x["slo",1] - 0.03, cor_x["slo",2] - 0.05, labels = "slo", cex = 0.74, font = 2, col = "#0d7377", pos = 2)
+text(cor_x["oxy",1] - 0.03, cor_x["oxy",2] + 0.05, labels = "oxy", cex = 0.74, font = 2, col = "#0d7377", pos = 3)
+text(cor_x["pH", 1] + 0.03, cor_x["pH", 2] + 0.05, labels = "pH", cex = 0.74, font = 2, col = "#0d7377", pos = 3)
+text(cor_x["nit",1] + 0.03, cor_x["nit",2] + 0.02, labels = "nit", cex = 0.72, font = 2, col = "#b45309", pos = 4)
+text(0.38, -1.02, labels = "amm", cex = 0.74, font = 2, col = "#b91c1c", pos = 2)
+text(0.58, -1.08, labels = "bdo", cex = 0.74, font = 2, col = "#b91c1c", pos = 1)
+text(0.72, -0.92, labels = "pho", cex = 0.74, font = 2, col = "#b91c1c", pos = 4)
 
 # PANEL 2 : FAUNE (Y)
 plot(0, 0, type = "n", xlim = c(-1.45, 1.55), ylim = c(-1.3, 1.3), asp = 1,
      xlab = "Axe 1 (88.4 %)", ylab = "Axe 2 (10.3 %)",
-     main = "Faune (Y) - 27 espèces", cex.main = 0.90, col.main = "#0b253a", las = 1)
-lines(cos(t), sin(t), col = "#334155", lwd = 1.3)
-lines(0.5*cos(t), 0.5*sin(t), col = "grey70", lty = 3)
-abline(h = 0, v = 0, lty = 2, col = "grey80")
+     main = "Faune (Y) - 27 espèces", cex.main = 0.92, col.main = "#0b253a", las = 1)
+lines(cos(t), sin(t), col = "#0f172a", lwd = 1.8)
+lines(0.5*cos(t), 0.5*sin(t), col = "#94a3b8", lty = 3)
+abline(h = 0, v = 0, lty = 2, col = "#cbd5e1")
 
 rheo <- c("Satr", "Phph", "Cogo", "Neba", "Thth", "Teso")
 cypr_rheo <- c("Baba", "Chna", "Spbi", "Lece")
 for (sp in rownames(cor_y)) {
-  col_arr <- if (sp %in% rheo) "#0d7377" else if (sp %in% cypr_rheo) "#b45309" else "#dc2626"
-  lwd_arr <- if (sp %in% c("Satr", "Phph", "Neba", "Abbr", "Ruru", "Baba", "Thth", "Cogo", "Teso", "Lece", "Chna", "Titi")) 1.8 else 0.7
-  arrows(0, 0, cor_y[sp,1] * 0.90, cor_y[sp,2] * 0.90, length = 0.06, col = col_arr, lwd = lwd_arr)
+  col_arr <- if (sp %in% rheo) "#0d7377" else if (sp %in% cypr_rheo) "#b45309" else "#b91c1c"
+  lwd_arr <- if (sp %in% c("Satr", "Phph", "Neba", "Abbr", "Ruru", "Baba", "Thth", "Cogo", "Teso", "Lece", "Chna", "Titi")) 2.2 else 0.8
+  arrows(0, 0, cor_y[sp,1] * 0.90, cor_y[sp,2] * 0.90, length = 0.07, col = col_arr, lwd = lwd_arr)
 }
-text(cor_y["Satr",1] - 0.04, cor_y["Satr",2] - 0.02, labels = "Truite (Satr)", cex = 0.68, font = 2, col = "#0d7377", pos = 2)
-text(cor_y["Phph",1] - 0.04, cor_y["Phph",2] + 0.04, labels = "Vairon (Phph)", cex = 0.68, font = 2, col = "#0d7377", pos = 2)
-text(cor_y["Baba",1] + 0.03, cor_y["Baba",2] + 0.07, labels = "Barbeau (Baba)", cex = 0.68, font = 2, col = "#b45309", pos = 3)
-text(cor_y["Abbr",1] + 0.03, cor_y["Abbr",2] + 0.04, labels = "Brème (Abbr)", cex = 0.68, font = 2, col = "#dc2626", pos = 4)
-text(cor_y["Ruru",1] + 0.03, cor_y["Ruru",2] - 0.04, labels = "Gardon (Ruru)", cex = 0.68, font = 2, col = "#dc2626", pos = 4)
-text(cor_y["Titi",1] + 0.03, cor_y["Titi",2] + 0.12, labels = "Tanche (Titi)", cex = 0.68, font = 2, col = "#dc2626", pos = 4)
+text(cor_y["Satr",1] - 0.04, cor_y["Satr",2] - 0.02, labels = "Truite (Satr)", cex = 0.70, font = 2, col = "#0d7377", pos = 2)
+text(cor_y["Phph",1] - 0.04, cor_y["Phph",2] + 0.04, labels = "Vairon (Phph)", cex = 0.70, font = 2, col = "#0d7377", pos = 2)
+text(cor_y["Baba",1] + 0.03, cor_y["Baba",2] + 0.07, labels = "Barbeau (Baba)", cex = 0.70, font = 2, col = "#b45309", pos = 3)
+text(cor_y["Abbr",1] + 0.03, cor_y["Abbr",2] + 0.04, labels = "Brème (Abbr)", cex = 0.70, font = 2, col = "#b91c1c", pos = 4)
+text(cor_y["Ruru",1] + 0.03, cor_y["Ruru",2] - 0.04, labels = "Gardon (Ruru)", cex = 0.70, font = 2, col = "#b91c1c", pos = 4)
+text(cor_y["Titi",1] + 0.03, cor_y["Titi",2] + 0.12, labels = "Tanche (Titi)", cex = 0.70, font = 2, col = "#b91c1c", pos = 4)
 
-legend("topleft", legend = c("Rhéophiles (Amont)", "Cyprinidés d'eaux vives", "Limnophiles (Aval)"),
-       col = c("#0d7377", "#b45309", "#dc2626"), lwd = 2, bty = "o", bg = "white", cex = 0.62)
+legend("topleft", legend = c("Rhéophiles (Amont)", "Cyprinidés vifs", "Limnophiles (Aval)"),
+       col = c("#0d7377", "#b45309", "#b91c1c"), lwd = 2.2, bty = "o", bg = "white", cex = 0.65)
 ```
 <p class="caption-custom">Figure 2 : Cercles de corrélation de la CIA (espaces $X$ et $Y$)</p>
 :::
 
-::: {.column width="38%"}
-<div style="font-size: 0.74em; line-height: 1.25; margin-top: 0.1em;">
+::: {.column width="40%"}
+<div style="font-size: 0.74em; line-height: 1.25; margin-top: 0.05em;">
 ```{r}
 #| echo: false
 library(knitr)
 cor_cia_x <- MVA.cor(co_doubs, set = 1, space = 1)$corr[c("dfs", "alt", "slo", "oxy", "amm"), 1:2]
 cor_cia_y <- MVA.cor(co_doubs, set = 2, space = 2)$corr[c("Satr", "Phph", "Baba", "Abbr", "Ruru"), 1:2]
 
+format_cor <- function(val) {
+  s <- sprintf("%+.2f", val)
+  if (val >= 0.70) return(paste0("<span class='cor-pos'>", s, "</span>"))
+  if (val <= -0.70) return(paste0("<span class='cor-neg'>", s, "</span>"))
+  return(s)
+}
+
 tab_synth <- data.frame(
-  "Variable" = c("Distance (dfs)", "Altitude (alt)", "Pente (slo)", "Oxygène (oxy)", "Ammonium (amm)",
-                 "Truite (Satr)", "Vairon (Phph)", "Barbeau (Baba)", "Brème (Abbr)", "Gardon (Ruru)"),
-  "Axe 1" = sprintf("%+.2f", c(cor_cia_x[,1], cor_cia_y[,1])),
-  "Axe 2" = sprintf("%+.2f", c(cor_cia_x[,2], cor_cia_y[,2])),
+  "Descripteur / Taxon" = c("Distance source (dfs)", "Altitude (alt)", "Pente (slo)", "Oxygène (oxy)", "Ammonium (amm)",
+                           "Truite fario (Satr)", "Vairon (Phph)", "Barbeau (Baba)", "Brème (Abbr)", "Gardon (Ruru)"),
+  "r (Axe 1)" = sapply(c(cor_cia_x[,1], cor_cia_y[,1]), format_cor),
+  "r (Axe 2)" = sapply(c(cor_cia_x[,2], cor_cia_y[,2]), format_cor),
   check.names = FALSE
 )
-colnames(tab_synth) <- c("Descripteur / Taxon", "r (Ax 1)", "r (Ax 2)")
-kable(tab_synth)
+kable(tab_synth, format = "html", escape = FALSE)
 ```
 </div>
 
-<div class="cours-box box-app" style="margin-top: 0.35em; font-size: 0.80em; line-height: 1.38;">
-<div class="cours-box-header">Interprétation factorielle</div>
-* **Axe 1 (88.4 %) — Continuum amont-aval :** Gradient morphodynamique (altitude $r = -0.93$ opposée à distance $r = +0.96$).
+<div class="cours-box box-app" style="margin-top: 0.30em; font-size: 0.80em; line-height: 1.36;">
+<div class="cours-box-header">Interprétation factorielle croisée</div>
+* **Axe 1 (88.4 %) — Continuum amont-aval :** Gradient morphodynamique (alt. $r = -0.93$ opposée à distance $r = +0.96$).
 * **Axe 2 (10.3 %) — Eutrophisation :** Gradient de charge dissoute (ammonium $r = -0.78$).
 </div>
 :::
@@ -548,6 +549,10 @@ points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, col = "#0b253a", c
 points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 1.05)
 text(co_doubs$mX[,1], co_doubs$mX[,2], labels = 1:30, pos = 3, cex = 0.65, font = 2, col = "#0b253a")
 
+# Repérage visuel des anomalies écologiques majeures
+text(co_doubs$mX[8,1] + 0.1, co_doubs$mX[8,2] + 0.35, "St. 8 (Assec)", cex = 0.68, font = 2, col = "#b91c1c")
+text(co_doubs$mX[24,1] + 0.1, co_doubs$mX[24,2] - 0.45, "St. 23-25 (Pollution)", cex = 0.68, font = 2, col = "#b91c1c")
+
 legend("bottomright", legend = c("Milieu attendu (X)", "Faune observée (Y)"),
        pch = c(21, 17), pt.bg = c("grey90", "black"), col = "black",
        bty = "o", box.col = "grey75", bg = "white", cex = 0.72)
@@ -562,6 +567,8 @@ La longueur des flèches mesure la distance résiduelle entre le biotope et la f
 :::
 
 ## 9. Comparatif méthodologique : AFM vs CIA (Co-inertie)
+
+<span class="section-tracker">Partie IV : Comparatif méthodologique, Bilan & Perspectives</span>
 
 ```{r}
 #| echo: false
@@ -580,13 +587,13 @@ ylim_mfa <- range(c(mfa_doubs$lisup[,2], mfa_doubs$li[,2])) * 1.15
 
 plot(0, 0, type = "n", xlim = xlim_mfa, ylim = ylim_mfa, xlab = "Dim 1", ylab = "Dim 2", las = 1)
 abline(h = 0, v = 0, lty = 2, col = "grey75")
-segments(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2], mfa_doubs$li[,1], mfa_doubs$li[,2], col = "grey65", lty = 3)
-segments(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2], mfa_doubs$li[,1], mfa_doubs$li[,2], col = "grey65", lty = 3)
-points(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2], pch = 21, bg = cols, cex = 1.05)
-points(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2], pch = 17, col = cols, cex = 1.0)
-points(mfa_doubs$li[,1], mfa_doubs$li[,2], pch = 3, col = "black", lwd = 1.5, cex = 0.85)
-title("AFM : Synthèse par barycentre (+)", line = 0.3, cex.main = 0.88)
-legend("topleft", legend = c("Milieu", "Faune", "Barycentre"), pch = c(21, 17, 3), pt.bg = c("grey90", "black", NA), bty = "o", bg = "white", cex = 0.65)
+segments(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2], mfa_doubs$li[,1], mfa_doubs$li[,2], col = "#94a3b8", lty = 3)
+segments(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2], mfa_doubs$li[,1], mfa_doubs$li[,2], col = "#94a3b8", lty = 3)
+points(mfa_doubs$lisup[1:30,1], mfa_doubs$lisup[1:30,2], pch = 21, bg = cols, cex = 1.1)
+points(mfa_doubs$lisup[31:60,1], mfa_doubs$lisup[31:60,2], pch = 17, col = cols, cex = 1.05)
+points(mfa_doubs$li[,1], mfa_doubs$li[,2], pch = 4, col = "#b91c1c", lwd = 2.2, cex = 1.1) # Barycentre net
+title("AFM : Consensus vers le barycentre commun (x)", line = 0.3, cex.main = 0.90, col.main = "#0b253a")
+legend("topleft", legend = c("Milieu attendu", "Faune observée", "Barycentre consensus"), pch = c(21, 17, 4), pt.bg = c("grey90", "black", NA), col = c("black", "black", "#b91c1c"), bty = "o", bg = "white", cex = 0.68)
 
 # 2. Panneau Co-inertie
 xlim_co <- range(c(co_doubs$mX[,1], co_doubs$mY[,1])) * 1.15
@@ -594,11 +601,11 @@ ylim_co <- range(c(co_doubs$mX[,2], co_doubs$mY[,2])) * 1.15
 
 plot(0, 0, type = "n", xlim = xlim_co, ylim = ylim_co, xlab = "Axe 1", ylab = "Axe 2", las = 1)
 abline(h = 0, v = 0, lty = 2, col = "grey75")
-arrows(co_doubs$mX[,1], co_doubs$mX[,2], co_doubs$mY[,1], co_doubs$mY[,2], length = 0.07, col = cols, lwd = 1.7)
-points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, cex = 1.05)
-points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 1.0)
-title("Co-inertie : Couplage vectoriel direct (X → Y)", line = 0.3, cex.main = 0.88)
-legend("bottomright", legend = c("Milieu attendu", "Faune observée"), pch = c(21, 17), pt.bg = c("grey90", "black"), bty = "o", bg = "white", cex = 0.65)
+arrows(co_doubs$mX[,1], co_doubs$mX[,2], co_doubs$mY[,1], co_doubs$mY[,2], length = 0.08, col = cols, lwd = 2.0)
+points(co_doubs$mX[,1], co_doubs$mX[,2], pch = 21, bg = cols, cex = 1.1)
+points(co_doubs$mY[,1], co_doubs$mY[,2], pch = 17, col = cols, cex = 1.05)
+title("Co-inertie : Couplage vectoriel direct (X -> Y)", line = 0.3, cex.main = 0.90, col.main = "#0b253a")
+legend("bottomright", legend = c("Milieu attendu", "Faune observée"), pch = c(21, 17), pt.bg = c("grey90", "black"), bty = "o", bg = "white", cex = 0.68)
 ```
 
 :::: {.columns}
@@ -623,55 +630,57 @@ Maximise directement la covariance croisée. Isole explicitement la direction et
 L'AFM cherche un consensus global autour d'un barycentre moyen. La co-inertie, elle, trace le vecteur direct du milieu vers le vivant : c'est un outil de diagnostic écologique incomparable.
 :::
 
-## 10. Bilan méthodologique : Analyse critique de la CIA
+## 10. Bilan méthodologique de la Co-inertie
 
 :::: {.columns}
 
 ::: {.column width="50%"}
-<div class="pros-box" style="line-height: 1.42;">
-<p style="font-weight: 700; color: #16a34a; font-size: 0.98em; margin-bottom: 0.35em;">Propriétés et atouts majeurs</p>
+<div class="pros-box" style="line-height: 1.45;">
+<p style="font-weight: 700; color: #16a34a; font-size: 0.98em; margin-bottom: 0.35em;">Atouts majeurs de la méthode</p>
 
-* **Haute dimension ($p + q \gg n$) :** Absence d'inversion matricielle, immunité contre la saturation dimensionnelle.
-* **Insensibilité à la colinéarité :** Décomposition spectrale par SVD toujours calculable et stable.
-* **Cadre formel des triplets :** Couplage flexible de tout couple d'analyses unidimensionnelles (ACP, AFC, ACM, PCoA).
-* **Outil de diagnostic vectoriel :** Visualisation immédiate des discordances stationnelles sur l'espace de compromis.
+* **Adaptée aux grands jeux de données :** Fonctionne sans blocage même lorsqu'il y a beaucoup plus de variables que d'observations ($p, q \gg n$).
+* **Insensible à la redondance :** Les fortes corrélations entre variables au sein d'un tableau ne perturbent pas le calcul.
+* **Grande souplesse :** S'adapte à différents types de données grâce aux analyses préalables (ACP pour du continu, AFC pour du comptage, etc.).
+* **Diagnostic visuel direct :** La représentation vectorielle permet de repérer en un coup d'œil les stations en accord et les anomalies locales.
 </div>
 :::
 
 ::: {.column width="50%"}
-<div class="cons-box" style="line-height: 1.42;">
-<p style="font-weight: 700; color: #e11d48; font-size: 0.98em; margin-bottom: 0.35em;">Limites et précautions d'usage</p>
+<div class="cons-box" style="line-height: 1.45;">
+<p style="font-weight: 700; color: #e11d48; font-size: 0.98em; margin-bottom: 0.35em;">Précautions et limites d'usage</p>
 
-* **Caractère descriptif et symétrique :** Méthode exploratoire non prédictive (ne produit pas d'équation causale $Y = f(X)$).
-* **Sensibilité aux valeurs extrêmes :** Un point aberrant à forte inertie peut biaiser l'orientation des axes.
-* **Condition d'inertie conjointe :** L'interprétation suppose que les premiers axes captent la majeure partie de la liaison.
-* **Conservation intégrale des variables :** Absence de régularisation ou de sélection automatique de descripteurs.
+* **Approche descriptive :** Met en évidence des liaisons et concordances, mais ne démontre pas de relation de cause à effet directe.
+* **Sensibilité aux valeurs extrêmes :** Une station très atypique peut avoir un poids excessif et orienter les axes factoriels.
+* **Nécessité d'une co-structure réelle :** L'analyse n'est pertinente que si les premiers axes capturent une part substantielle de l'inertie conjointe.
+* **Pas de sélection automatique :** Toutes les variables sont conservées sans tri automatique préalable.
 </div>
 :::
 
 ::::
 
 ::: {.notes}
-Ce tableau synthétique résume les atouts et limites : la co-inertie excelle quand les variables dépassent les individus, mais reste un outil exploratoire et descriptif sensible aux valeurs extrêmes.
+Ce bilan résume les atouts et précautions : la co-inertie est un outil exploratoire très robuste, capable de traiter un grand nombre de variables sans contrainte, mais restant descriptif et sensible aux valeurs aberrantes.
 :::
 
-## 11. Synthèse générale & Perspectives
+## 11. Bilan de l'étude & Perspectives applicatives
 
 :::: {.columns}
 
-::: {.column width="50%"}
+::: {.column width="48%"}
 <div class="cours-box box-def">
-<div class="cours-box-header">Bilan de l'analyse du Doubs</div>
+<div class="cours-box-header">Bilan de l'étude du Doubs</div>
 
-* **Compromis théorique validé :** Maximisation conjointe des variances propres et de la corrélation canonique ($r > 0.73$).
-* **Significativité statistique :** Couplage global confirmé par test de permutation ($RV = 0.451$, $p = 0.001$).
-* **Cohérence écologique :** Reconstitution du continuum longitudinal sur l'Axe 1 et détection des ruptures environnementales sur l'Axe 2.
+* **Une liaison forte et validée :** Le milieu et les peuplements de poissons sont étroitement couplés ($RV = 0.451$, confirmé par le test de permutation, $p = 0.001$).
+* **Une synthèse efficace :** Deux dimensions suffisent à résumer près de 99 % de l'information conjointe.
+* **Deux enseignements écologiques majeurs :**
+  - **Axe 1 :** L'organisation naturelle de la rivière d'amont en aval (altitude et pente vs débit et distance).
+  - **Axe 2 :** L'identification nette des perturbations locales (assec karstique station 8, pollutions stations 23 à 25).
 </div>
 :::
 
-::: {.column width="50%"}
+::: {.column width="52%"}
 <div class="cours-box box-prop">
-<div class="cours-box-header">Perspectives applicatives</div>
+<div class="cours-box-header">PERSPECTIVES APPLICATIVES</div>
 
 * **Écologie microbienne des sols :** Couplage physico-chimie des sols ($X$) et profils métagénomiques 16S / ITS ($Y$).
 * **Suivi de successions écologiques :** Quantification de la trajectoire biotique le long de gradients temporels ou de dilution.
@@ -682,11 +691,11 @@ Ce tableau synthétique résume les atouts et limites : la co-inertie excelle qu
 ::::
 
 <div class="cours-box box-theo" style="margin-top: 0.55em; padding: 0.8em 1.2em; text-align: center; font-size: 1.02em; font-weight: 700; color: #0b253a;">
-La co-inertie s'impose comme la méthode d'ordination multitableaux de référence pour relier des matrices multidimensionnelles hétérogènes sans contrainte de rang ni de dimension.
+La co-inertie s’impose comme la méthode d’ordination multitableaux de référence pour relier des matrices multidimensionnelles hétérogènes sans contrainte de rang ni de dimension.
 </div>
 
 ::: {.notes}
-En conclusion, la co-inertie allie élégance mathématique et puissance diagnostique. Sa capacité à opérer en haute dimension la rend indispensable pour les problématiques actuelles de métagénomique et de diversité microbienne.
+En conclusion, sur l'exemple du Doubs, la co-inertie synthétise parfaitement le couplage milieu-faune tout en révélant les anomalies locales. Ses perspectives d'application en écologie microbienne et en intégration multi-omique sont majeures.
 :::
 
 ## Annexe A. Synthèse écologique : Zonation de Huet & Continuum fluvial

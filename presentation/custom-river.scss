@@ -246,6 +246,32 @@ $presentation-font-size-root: 24.5px;
 .box-app .cours-box-header { color: #059669; }
 .box-rem .cours-box-header { color: #b45309; }
 
+// Fil d'Ariane discret (Section Tracker)
+.section-tracker {
+  display: inline-block;
+  font-size: 0.65em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0d7377;
+  background: #e6fffa;
+  padding: 0.18em 0.65em;
+  border-radius: 4px;
+  margin-bottom: 0.35em;
+  border: 1px solid #b2f5ea;
+}
+
+// Couleurs de surbrillance pour les corrélations
+.cor-pos {
+  color: #047857 !important;
+  font-weight: 700;
+}
+
+.cor-neg {
+  color: #b91c1c !important;
+  font-weight: 700;
+}
+
 // Mini badges modernes
 .badge-eco {
   display: inline-block;
